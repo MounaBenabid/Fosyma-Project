@@ -11,6 +11,7 @@ import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 public class SignalReceptionBehaviour extends OneShotBehaviour {
 
@@ -35,7 +36,8 @@ public class SignalReceptionBehaviour extends OneShotBehaviour {
 		if (msgReceived!=null) {
 			System.out.println(this.myAgent.getLocalName() +" is in SignalReception and he got a message !");
 			end = 1;  
-			((ExploreCoopAgent)this.myAgent).addOtherAgentsPos((String) msgReceived.getContent());
+			((ExploreCoopAgent)this.myAgent).addOtherAgentsPos(msgReceived.getContent());
+			
 			System.out.println(this.myAgent.getLocalName() + " has learned that " + msgReceived.getSender().getLocalName() + " is at position " + (String) msgReceived.getContent());
 			
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);

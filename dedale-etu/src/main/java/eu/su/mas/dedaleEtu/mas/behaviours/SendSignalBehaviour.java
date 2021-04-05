@@ -56,12 +56,8 @@ public class SendSignalBehaviour extends OneShotBehaviour {
 		for (String agentName : agentNames) {
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 			System.out.println(this.myAgent.getLocalName() + " sent his position to " + agentName);
-		}
-		try {					
-			msg.setContentObject(myPosition);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		}				
+		msg.setContent(myPosition);
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 	}
 
