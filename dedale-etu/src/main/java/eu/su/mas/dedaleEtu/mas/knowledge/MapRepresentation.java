@@ -172,6 +172,27 @@ public class MapRepresentation implements Serializable {
 		return getShortestPath(myPosition,closest.get().getLeft());
 	}
 
+	
+	public List<Couple<String,Integer>> getDistanceOpenNodes(String myPosition){
+		//1) Get all openNodes
+		List<String> opennodes=getOpenNodes();
+		
+		List<Couple<String,Integer>> lc=new ArrayList<Couple<String,Integer>>();
+		
+		for (int i=0; i<opennodes.size(); i++) {
+			if (getShortestPath(myPosition,opennodes.get(i))!=null) {
+				lc.add(new Couple<String,Integer>(opennodes.get(i),getShortestPath(myPosition,opennodes.get(i)).size()));
+			}
+			else {
+				lc.add(new Couple<String,Integer>(opennodes.get(i),Integer.MAX_VALUE));
+			}
+		}
+		
+		//lc.stream().sorted(Comparator.comparing(Couple::getRight));
+		lc.sort(Comparator.comparing(Couple::getRight));
+		
+		return lc;
+	}
 
 
 	public List<String> getOpenNodes(){

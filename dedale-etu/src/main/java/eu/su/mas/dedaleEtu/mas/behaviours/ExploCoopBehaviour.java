@@ -1,29 +1,21 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
-import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
-import eu.su.mas.dedaleEtu.mas.behaviours.ShareMapBehaviour;
-
-
+import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreCoopAgent;
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
+import jade.domain.AMSService;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 
 
 /**
@@ -53,6 +45,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 
 	private List<String> list_agentNames;
 
+
 /**
  * 
  * @param myagent
@@ -64,32 +57,45 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 		this.myMap=myMap;
 		this.list_agentNames=agentNames;
 		
-		
 	}
 
+	private  List<String> getAgentsList(){
+		AMSAgentDescription [] agentsDescriptionCatalog = null;
+		List<String> agentsNames= new ArrayList<String>();
+		try {
+			SearchConstraints c = new SearchConstraints();
+			c.setMaxResults ( Long.valueOf(-1) );
+			agentsDescriptionCatalog = AMSService.search(this.myAgent, new AMSAgentDescription(), c );
+		}
+		catch (Exception e) {
+			e. printStackTrace();
+		}
+		for (int i=0; i<agentsDescriptionCatalog.length; i++){
+			AID agentID = agentsDescriptionCatalog[i].getName();
+			if (agentID.getLocalName().compareTo(this.myAgent.getLocalName()) != 0 && agentID.getLocalName().contains("Explo")) {
+				agentsNames.add(agentID.getLocalName());
+			}
+		}
+		return agentsNames;
+	}
+	
 	@Override
 	public void action() {
-
-		if(this.myMap==null) {
-			this.myMap= new MapRepresentation();
-			this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent,500,this.myMap,list_agentNames));
-		}
-
+		
+        //Little pause to allow you to follow what is going on
+//        try {
+//            System.out.println("Press enter in the console to allow the agent "+this.myAgent.getLocalName() +" to execute its next move");
+//            System.in.read();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+		
 		//0) Retrieve the current position
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-
+		
 		if (myPosition!=null){
 			//List of observable from the agent's current position
 			List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
-
-			/**
-			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
-			 */
-			try {
-				this.myAgent.doWait(250);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 
 			//1) remove the current node from openlist and add it to closedNodes.
 			this.myMap.addNode(myPosition, MapAttribute.closed);
@@ -106,6 +112,19 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 					if (nextNode==null && isNewNode) nextNode=nodeId;
 				}
 			}
+			
+			
+			List<String> otherAgentsPos = ((ExploreCoopAgent)this.myAgent).getOtherAgentsPos();
+		
+			
+			/**
+			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
+			 */
+			try {
+				this.myAgent.doWait(250);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
 			//3) while openNodes is not empty, continues.
 			if (!this.myMap.hasOpenNode()){
@@ -119,7 +138,41 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				if (nextNode==null){
 					//no directly accessible openNode
 					//chose one, compute the path and take the first step.
-					nextNode=this.myMap.getShortestPathToClosestOpenNode(myPosition).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
+					List<Couple<String,Integer>> nodeUs = this.myMap.getDistanceOpenNodes(myPosition);
+					if (otherAgentsPos.isEmpty() || nodeUs.size()==1) {
+						nextNode=this.myMap.getShortestPathToClosestOpenNode(myPosition).get(0);
+						System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode);
+					}
+					else {
+						int i = 0;
+						System.out.println(this.myAgent.getLocalName() + " can go to " + nodeUs);
+						while (nextNode == null) {
+							int j = 0;
+							//we compare our path with the other agents
+							for (String pos : otherAgentsPos) {
+								System.out.println("The other agent is at position " + pos);
+								List<Couple<String,Integer>> nodeThem = this.myMap.getDistanceOpenNodes(pos);
+								System.out.println("The other agent can go to " + nodeThem);
+								if (nodeUs.get(i).getLeft().compareTo(nodeThem.get(0).getLeft())==0) {
+									if (nodeUs.get(i).getRight() > nodeThem.get(0).getRight()) {
+										i++;
+										break;
+									}
+								}
+								j++;
+							
+							}
+							if (j == otherAgentsPos.size()) {
+								nextNode=this.myMap.getShortestPath(myPosition,nodeUs.get(i).getLeft()).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
+								System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode);
+							}
+							else if (i == otherAgentsPos.size()) {
+								nextNode=this.myMap.getShortestPathToClosestOpenNode(myPosition).get(0);
+							}
+						}
+					
+					}
+				
 					//System.out.println(this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"| nextNode: "+nextNode);
 				}else {
 					//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
@@ -145,21 +198,22 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 
 				//5) At each time step, the agent check if he received a graph from a teammate. 	
 				// If it was written properly, this sharing action should be in a dedicated behaviour set.
-				MessageTemplate msgTemplate=MessageTemplate.and(
-						MessageTemplate.MatchProtocol("SHARE-TOPO"),
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-				ACLMessage msgReceived=this.myAgent.receive(msgTemplate);
-				if (msgReceived!=null) {
-					SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
-					try {
-						sgreceived = (SerializableSimpleGraph<String, MapAttribute>)msgReceived.getContentObject();
-					} catch (UnreadableException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					this.myMap.mergeMap(sgreceived);
-				}
-
+//				MessageTemplate msgTemplate=MessageTemplate.and(
+//						MessageTemplate.MatchProtocol("SHARE-TOPO"),
+//						MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+//				ACLMessage msgReceived=this.myAgent.receive(msgTemplate);
+//				if (msgReceived!=null) {
+//					SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
+//					try {
+//						sgreceived = (SerializableSimpleGraph<String, MapAttribute>)msgReceived.getContentObject();
+//					} catch (UnreadableException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					this.myMap.mergeMap(sgreceived);
+//					System.out.println(this.myAgent.getLocalName() + " received the map of " + msgReceived.getSender().getLocalName());
+//				}
+				((ExploreCoopAgent)this.myAgent).emptyOtherAgentsPos();
 				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
 			}
 
