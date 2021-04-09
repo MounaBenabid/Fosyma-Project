@@ -1,56 +1,86 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+
 import dataStructures.serializableGraph.SerializableSimpleGraph;
-import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreCoopAgent;
+import dataStructures.tuple.Couple;
+import eu.su.mas.dedale.env.Observation;
+import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
-import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreSoloAgent;
+//import eu.su.mas.dedale.mas.agents.dedaleDummyAgents.Explo.ExploreSoloAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreMultiAgent;
+import jade.core.behaviours.SimpleBehaviour;
+
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-public class ReceiveMapBehaviour extends OneShotBehaviour{
+
+public class ReceiveMapBehaviour extends SimpleBehaviour implements Serializable{
+
+	private static final long serialVersionUID = -4454538062320130950L;
+
+	private boolean finished=false;
 	
+	private boolean result=false;
+
 	private MapRepresentation myMap;
-
-	/**
-	 * The agent periodically share its map.
-	 * It blindly tries to send all its graph to its friend(s)  	
-	 * If it was written properly, this sharing action would NOT be in a ticker behaviour and only a subgraph would be shared.
-
-	 * @param a the agent
-	 * @param period the periodicity of the behaviour (in ms)
-	 * @param mymap (the map to share)
-	 * @param receivers the list of agents to send the map to
-	 */
-	public ReceiveMapBehaviour(Agent a) {
-		super(a);
+	
+	public ReceiveMapBehaviour(final AbstractDedaleAgent myagent, MapRepresentation myMap) {
+		super(myagent);
+		this.myMap = myMap;
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -568863390879327961L;
 
-
-	@Override
 	public void action() {
-		System.out.println(this.myAgent.getLocalName() + " is in ReceiveMap for some reason lol");
-		this.myMap = ((ExploreCoopAgent)this.myAgent).getMyMap();
-		MessageTemplate msgTemplate=MessageTemplate.and(
-				MessageTemplate.MatchProtocol("SHARE-TOPO"),
-				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-		ACLMessage msgReceived=this.myAgent.blockingReceive(msgTemplate);
-		SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
-		try {
-			sgreceived = (SerializableSimpleGraph<String, MapAttribute>)msgReceived.getContentObject();
-		} catch (UnreadableException e) {
-			e.printStackTrace();
+		
+		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+		
+		if (myPosition!=null){
+			
+			final MessageTemplate msgTemplate = MessageTemplate.and(
+					MessageTemplate.MatchProtocol("SHARE-TOPO"),
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+										
+			final ACLMessage msg = this.myAgent.receive(msgTemplate);
+			//System.out.println("<---- test receivemap ");
+			if (msg != null) {								
+				try {
+					Couple<String, SerializableSimpleGraph<String, MapAttribute>> o = (Couple<String, SerializableSimpleGraph<String, MapAttribute>>) msg.getContentObject();
+					if (o != null) {
+						((ExploreMultiAgent)this.myAgent).addOtherAgentsPos(msg.getSender().getLocalName(), o.getLeft());
+						System.out.println(this.myAgent.getLocalName()+ "<---- Position received from "+msg.getSender().getLocalName() + ": " +o.getLeft());
+						this.myMap = ((ExploreMultiAgent)this.myAgent).getMyMap();
+						this.myMap.mergeMap(o.getRight());
+						((ExploreMultiAgent)this.myAgent).setMyMap(this.myMap);
+						System.out.println(this.myAgent.getLocalName()+ "<---- Map received from "+msg.getSender().getLocalName());
+						this.result=true;
+					}
+				} catch (UnreadableException e) {
+					e.printStackTrace();
+				}
+			}	
+			else {
+				this.result = false;
+			}
+			this.finished = true;
 		}
-		this.myMap.mergeMap(sgreceived);
-		((ExploreCoopAgent)this.myAgent).changeMyMap(this.myMap);
-		System.out.println(this.myAgent.getLocalName() + " received the map of " + msgReceived.getSender().getLocalName());
+	}
+
+	public boolean done() {
+		return finished;
 	}
 	
+	@Override
+	public int onEnd() {
+		if (this.result) return 1;
+		else return 0;
+	}
+
 }
+
+
