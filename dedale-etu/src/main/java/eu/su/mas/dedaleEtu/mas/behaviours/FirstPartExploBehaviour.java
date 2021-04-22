@@ -73,7 +73,7 @@ public class FirstPartExploBehaviour extends OneShotBehaviour {
 		if (myPosition!=null){
 			//List of observable from the agent's current position
 			List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
-
+			
 			/**
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */

@@ -1,5 +1,7 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.util.List;
+
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreSoloAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
@@ -18,43 +20,47 @@ public class CommunicationBehaviour extends ParallelBehaviour {
 	private int end;
 	
 	
-	public CommunicationBehaviour(final AbstractDedaleAgent myagent, String receiverName, MapRepresentation myMap) {
+	public CommunicationBehaviour(final AbstractDedaleAgent myagent, List<String> agentsNames, MapRepresentation myMap) {
 		super();
 		
-		
-		SendMsgBehaviour sendMsgB = new SendMsgBehaviour(myagent, receiverName);
-		ReceiveMsgBehaviour	receiveMsgB = new ReceiveMsgBehaviour(myagent);
-		SendMapBehaviour sendMapB = new SendMapBehaviour(myagent, receiverName, myMap);
-		ReceiveMapBehaviour receiveMapB = new ReceiveMapBehaviour(myagent, myMap);
-		LastStateBehaviour lastState = new LastStateBehaviour();
-		
-		FSMBehaviour fsmSend = new FSMBehaviour(myagent);
-		fsmSend.registerFirstState(sendMsgB, "ping");
-		fsmSend.registerLastState(sendMapB, "shareMap");
-		fsmSend.registerLastState(lastState, "end");
-		fsmSend.registerTransition("ping", "shareMap", 1);
-		fsmSend.registerTransition("ping", "end", 0);
-		
-		FSMBehaviour fsmReceive = new FSMBehaviour(myagent);
-		fsmReceive.registerFirstState(receiveMsgB, "getPing");
-		fsmReceive.registerLastState(receiveMapB, "receiveMap");
-		fsmReceive.registerLastState(lastState, "end");
-		fsmReceive.registerTransition("getPing", "receiveMap", 1);
-		fsmReceive.registerTransition("getPing", "end", 0);
-		
-		addSubBehaviour(fsmSend);
-		addSubBehaviour(fsmReceive);
-		
-		if(sendMsgB.onEnd() == 1) {
-			if(sendMapB.onEnd() == 0)
-				end = 0;
-		}
-		else if(receiveMsgB.onEnd() == 1) {
-			if(receiveMapB.onEnd() == 0)
-				end = 0;
-		}
-		else {
-			end = 1;
+		end = 1;
+		for (int i=0; i<agentsNames.size(); i++) {
+			String agentName = agentsNames.get(i);
+			
+			SendMsgBehaviour sendMsgB = new SendMsgBehaviour(myagent, agentName);
+			ReceiveMsgBehaviour	receiveMsgB = new ReceiveMsgBehaviour(myagent);
+			SendMapBehaviour sendMapB = new SendMapBehaviour(myagent, agentName, myMap);
+			ReceiveMapBehaviour receiveMapB = new ReceiveMapBehaviour(myagent, myMap);
+			LastStateBehaviour lastState = new LastStateBehaviour();
+			
+			FSMBehaviour fsmSend = new FSMBehaviour(myagent);
+			fsmSend.registerFirstState(sendMsgB, "ping");
+			fsmSend.registerLastState(sendMapB, "shareMap");
+			fsmSend.registerLastState(lastState, "end");
+			fsmSend.registerTransition("ping", "shareMap", 1);
+			fsmSend.registerTransition("ping", "end", 0);
+			
+			FSMBehaviour fsmReceive = new FSMBehaviour(myagent);
+			fsmReceive.registerFirstState(receiveMsgB, "getPing");
+			fsmReceive.registerLastState(receiveMapB, "receiveMap");
+			fsmReceive.registerLastState(lastState, "end");
+			fsmReceive.registerTransition("getPing", "receiveMap", 1);
+			fsmReceive.registerTransition("getPing", "end", 0);
+			
+			addSubBehaviour(fsmSend);
+			addSubBehaviour(fsmReceive);
+			
+			if(sendMsgB.onEnd() == 1) {
+				if(sendMapB.onEnd() == 0)
+					end = 0;
+			}
+			else if(receiveMsgB.onEnd() == 1) {
+				if(receiveMapB.onEnd() == 0)
+					end = 0;
+			}
+			/*else {
+				end = 1;
+			}*/
 		}
 	}
 

@@ -14,6 +14,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveMapBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveMsgBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendMapBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendMsgBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.TransitionBehaviour;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
@@ -57,32 +58,35 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 	
-		List <String> agentsNames = this.getAgentsList();
-		for (int i=0; i<agentsNames.size(); i++) {
-			String agentName = agentsNames.get(i);
+		List <String> agentsNames = new ArrayList<String>();
+		
+		List <String> agents_ams = this.getAgentsList();
+		for (int i=0; i<agents_ams.size(); i++) {
+			String agentName = agents_ams.get(i);
 			if (!agentName.equals(this.getLocalName()) && agentName.contains("Explo")) {
-				
-				FirstPartExploBehaviour firstExploSB = new FirstPartExploBehaviour(this,this.myMap);
-				ExploMultiBehaviour exploSB = new ExploMultiBehaviour(this,this.myMap);
-				LastStateBehaviour lastState = new LastStateBehaviour();
-				
-				FSMBehaviour fsmCallB = new FSMBehaviour(this);				
-				CommunicationBehaviour com = new CommunicationBehaviour(this, agentName, this.myMap);
-				
-				fsmCallB.registerFirstState(firstExploSB, "firstExplo");
-				fsmCallB.registerState(com, "communication");
-				fsmCallB.registerState(exploSB, "explo");
-				fsmCallB.registerLastState(lastState, "end");
-				
-				fsmCallB.registerDefaultTransition("firstExplo", "communication");
-				fsmCallB.registerTransition("communication", "communication", 0);
-				fsmCallB.registerTransition("communication", "explo", 1);
-				fsmCallB.registerTransition("explo", "firstExplo", 0);
-				fsmCallB.registerTransition("explo", "end", 1);
-				
-				lb.add(fsmCallB);
+				agentsNames.add(agentName);
 			}
 		}
+		
+		FirstPartExploBehaviour firstExploSB = new FirstPartExploBehaviour(this,this.myMap);
+		ExploMultiBehaviour exploSB = new ExploMultiBehaviour(this,this.myMap);
+		TransitionBehaviour lastState = new TransitionBehaviour(this);
+		
+		FSMBehaviour fsmCallB = new FSMBehaviour(this);				
+		CommunicationBehaviour com = new CommunicationBehaviour(this, agentsNames, this.myMap);
+		
+		fsmCallB.registerFirstState(firstExploSB, "firstExplo");
+		fsmCallB.registerState(com, "communication");
+		fsmCallB.registerState(exploSB, "explo");
+		fsmCallB.registerLastState(lastState, "end");
+		
+		fsmCallB.registerDefaultTransition("firstExplo", "communication");
+		fsmCallB.registerTransition("communication", "communication", 0);
+		fsmCallB.registerTransition("communication", "explo", 1);
+		fsmCallB.registerTransition("explo", "firstExplo", 0);
+		fsmCallB.registerTransition("explo", "end", 1);
+		
+		lb.add(fsmCallB);
 		
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
