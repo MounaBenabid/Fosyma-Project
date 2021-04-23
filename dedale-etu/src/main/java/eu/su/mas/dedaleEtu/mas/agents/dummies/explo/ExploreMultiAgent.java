@@ -41,6 +41,10 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	private boolean waiting = false;
 	private List<Couple<String, String>> otherAgentsPos;
 	private String nextNode;
+	private List<String> nodesStench;
+	private List<String> obsNodes;
+	private List<Couple<String, List<String>>> othNodesStench;
+	private String lastPosition;
 	
 
 	/**
@@ -55,6 +59,8 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		super.setup();
 		
 		this.initializeOtherAgentsPos();
+		
+		lastPosition = null;
 		
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 	
@@ -127,7 +133,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		otherAgentsPos.add(new Couple<String, String>(name, pos));
 	}
 	
-	public List<Couple<String, String>> getOtherAgentsPos(){
+	public List<Couple<String, String>> getOtherAgentsPos() {
 		return otherAgentsPos;
 	}
 	
@@ -137,6 +143,42 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	
 	public String getNextNode() {
 		return nextNode;
+	}
+	
+	public void setNodesStench(List<String> nodes) {
+		nodesStench = nodes;
+	}
+	
+	public List<String> getNodesStench() {
+		return nodesStench;
+	}
+	
+	public void setObsNodes(List<String> nodes) {
+		obsNodes = nodes;
+	}
+	
+	public List<String> getObsNodes() {
+		return obsNodes;
+	}
+	
+	public void setOthNodesStench(List<Couple<String, List<String>>> nodes) {
+		othNodesStench = nodes;
+	}
+	
+	public void addOthNodesStench(Couple<String, List<String>> nodes) {
+		othNodesStench.add(nodes);
+	}
+	
+	public List<Couple<String, List<String>>> getOthNodesStench() {
+		return othNodesStench;
+	}
+	
+	public void setLastPosition(String p) {
+		lastPosition = p;
+	}
+	
+	public String getLastPosition() {
+		return lastPosition;
 	}
 	
 	/**

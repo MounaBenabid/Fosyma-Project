@@ -1,8 +1,19 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
+import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreMultiAgent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
+import jade.core.AID;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.AMSService;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 
 public class TransitionBehaviour extends OneShotBehaviour {
 
@@ -17,7 +28,41 @@ public class TransitionBehaviour extends OneShotBehaviour {
 	
 	@Override
 	public void action() {
+		List<Behaviour> lb=new ArrayList<Behaviour>();
+		
+		List <String> agentsNames = new ArrayList<String>();
+		
+		List <String> agents_ams = this.getAgentsList();
+		for (int i=0; i<agents_ams.size(); i++) {
+			String agentName = agents_ams.get(i);
+			if (!agentName.equals(this.myAgent.getLocalName()) && agentName.contains("Explo")) {
+				agentsNames.add(agentName);
+			}
+		}
+		
 		FSMBehaviour fsmChasse = new FSMBehaviour(this.myAgent);
+		FirstPartChasseBehaviour fpCB = new FirstPartChasseBehaviour(this.myAgent);
+		CommunicationChasseBehaviour cCB = new CommunicationChasseBehaviour(this.myAgent, agentsNames);
+		ChasseMultiBehaviour cmCB = new ChasseMultiBehaviour(this.myAgent);
+		LastStateBehaviour lsB = new LastStateBehaviour();
+		
+		fsmChasse.registerFirstState(fpCB, "fpCB");
+		fsmChasse.registerState(cCB, "cCB");
+		fsmChasse.registerState(cmCB, "cmCB");
+		fsmChasse.registerLastState(lsB, "lsB");
+		
+		fsmChasse.registerDefaultTransition("fpCB", "cmCB");
+		fsmChasse.registerTransition("fpCB", "cCB", 1);
+		fsmChasse.registerDefaultTransition("cCB", "cmCB");
+		fsmChasse.registerDefaultTransition("cmCB", "fpCB");
+		fsmChasse.registerTransition("cmCB", "lsB", 1);
+		
+		
+		/***
+		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
+		 */
+		this.myAgent.addBehaviour(fsmChasse);
+		
 		/** on établit ici si on est dans une grille ou un arbre en
 		testant si des nodes ont 1, ou plus de 4 edges (on est donc
 		dans un arbre)
@@ -82,6 +127,27 @@ public class TransitionBehaviour extends OneShotBehaviour {
 		continuer de suivre l'odeur)
 		 * 
 		 */
+	}
+	
+	public List <String> getAgentsList(){
+		AMSAgentDescription [] agentsDescriptionCatalog = null ;
+		List <String> agentsNames= new ArrayList<String>();
+		try {
+			SearchConstraints c = new SearchConstraints();
+			c.setMaxResults ( Long.valueOf(-1) );
+			agentsDescriptionCatalog = AMSService.search(this.myAgent, new AMSAgentDescription (), c );
+		}
+		catch (Exception e) {
+			System.out. println ( "Problem searching AMS: " + e );
+			e . printStackTrace () ;
+		}
+	
+		for ( int i =0; i<agentsDescriptionCatalog. length ; i ++){
+			AID agentID = agentsDescriptionCatalog[i ]. getName();
+			agentsNames.add(agentID.getLocalName());
+		}
+		return agentsNames;
+	
 	}
 
 }

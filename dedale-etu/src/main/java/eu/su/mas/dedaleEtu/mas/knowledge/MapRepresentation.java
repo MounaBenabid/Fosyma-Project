@@ -1,5 +1,6 @@
 package eu.su.mas.dedaleEtu.mas.knowledge;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.graphstream.algorithm.Dijkstra;
 import org.graphstream.graph.Edge;
@@ -333,6 +335,27 @@ public class MapRepresentation implements Serializable {
 		return (this.g.nodes()
 				.filter(n -> n.getAttribute("ui.class")==MapAttribute.open.toString())
 				.findAny()).isPresent();
+	}
+	
+	public Couple<Integer,List<String>> sendNodeEdges(String id) {
+		Node n = this.g.getNode(id);
+		Stream<Edge> edges = n.edges();
+		List<String> nodes = new ArrayList<String>();
+		
+		int count = 0;
+		
+		for (Object e : edges.toArray()) {
+			if (((Edge) e).getNode0().getId().equals(id))
+				nodes.add(((Edge) e).getNode1().getId());
+			
+			else if (((Edge) e).getNode1().getId().equals(id)){
+				nodes.add(((Edge) e).getNode0().getId());
+			}
+			
+			count += 1;
+		}
+		
+		return new Couple<Integer,List<String>>(count, nodes);
 	}
 
 
