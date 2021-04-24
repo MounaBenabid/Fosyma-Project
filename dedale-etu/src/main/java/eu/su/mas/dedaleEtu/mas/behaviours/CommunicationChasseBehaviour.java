@@ -8,16 +8,19 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreMultiAgent;
 
-public class CommunicationChasseBehaviour extends OneShotBehaviour {
+public class CommunicationChasseBehaviour extends SimpleBehaviour {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8141118043424030960L;
-	private int end;
+	private boolean finished;
 	private List<String> receiversNames;
 	
 	public CommunicationChasseBehaviour(final Agent myagent, List<String> agentsNames) {
@@ -26,10 +29,7 @@ public class CommunicationChasseBehaviour extends OneShotBehaviour {
 
 	}
 	
-	public void action() {
-		
-		end = 0;
-		
+	private void sendMsg() {
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		String positionGolem = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
 		
@@ -52,10 +52,34 @@ public class CommunicationChasseBehaviour extends OneShotBehaviour {
 		}
 	}
 	
+	private void getMsg() {
+		final MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("CHASSE-STENCH"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+											
+		ACLMessage msg = this.myAgent.receive(msgTemplate);
+				
+		if (msg != null) {	
+			try {
+				Couple<Couple<String,String>, List<String>> o = (Couple<Couple<String,String>, List<String>>) msg.getContentObject();					
+				((ExploreMultiAgent)this.myAgent).addOthNodesStench(o);
+			} catch (UnreadableException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void action() {
+		sendMsg();
+		for (int i=0; i<receiversNames.size(); i++) {
+			getMsg();
+		}
+		this.finished = true;
+	}
+
 	@Override
-	public int onEnd() {
-		this.reset();
-		return end;
+	public boolean done() {
+		return finished;
 	}
 
 }

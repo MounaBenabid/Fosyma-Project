@@ -42,13 +42,12 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 			
 			for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
 				if (c.getLeft().getRight() != null) {
-					givenGolem = true;
+					if (this.myMap.sendNodeEdges(c.getLeft().getRight()).getLeft() > 1)
+						givenGolem = true;
 				}
 			}
 			
 			if (((ExploreMultiAgent)this.myAgent).getPositionGolem() != null) {
-				golem = false;
-				
 				for (String node : ((ExploreMultiAgent)this.myAgent).getNodesStench()) {
 					if (((ExploreMultiAgent)this.myAgent).getPositionGolem().equals(node))
 						golem = true;
@@ -66,19 +65,48 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				givenPGolem = true;
 				
 				for (String s : ((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getLeft()) {
-					if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().equals(s)) {
+					if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight().equals(s)) {
 						givenPGolem = false;
 						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
 					}
 				}
 				
 				for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
-					if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getPositionGolem())) {
+					if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
 						givenPGolem = false;
 						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
 					}
 				}
 			}
+			
+			if (givenGolem) {
+				List<Couple<Couple<String,String>, List<String>>> othNodesStench = ((ExploreMultiAgent)this.myAgent).getOthNodesStench();
+				List<String> others = new ArrayList<String>();
+				List<String> golems = new ArrayList<String>();
+				
+				for (Couple<Couple<String,String>, List<String>> c : othNodesStench) {
+					if (c.getLeft().getRight() != null) {
+						others.add(c.getLeft().getLeft());
+						if (this.myMap.sendNodeEdges(c.getLeft().getRight()).getLeft() > 1)
+							golems.add(c.getLeft().getRight());
+					}
+				}
+				
+				givenGolem = false;
+				
+				for (String golemC : golems) {
+					List<String> path = this.myMap.shortestPathNewMap(myPosition, golemC, others);
+					
+					if (path!=null)
+						if (!path.isEmpty())
+							givenGolem = true;
+				}
+					
+			}
+			
+			/**
+			 * Décision de nextNode.
+			 */
 			
 			if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty() && ((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()
 					&& !givenPGolem) {
@@ -117,19 +145,48 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				
 				int na = rand.nextInt(size);
 				
+				System.out.println(this.myAgent.getLocalName() + " -- 1");
 				nextNode = nodes.get(na);
 			}
 			
 			else if (golem) {
+				System.out.println(this.myAgent.getLocalName() + " -- 2");
 				nextNode = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
 			}
 			
 			else if (givenGolem) {
 				
+				List<Couple<Couple<String,String>, List<String>>> othNodesStench = ((ExploreMultiAgent)this.myAgent).getOthNodesStench();
+				List<String> others = new ArrayList<String>();
+				List<String> golems = new ArrayList<String>();
+				
+				for (Couple<Couple<String,String>, List<String>> c : othNodesStench) {
+					if (c.getLeft().getRight() != null) {
+						others.add(c.getLeft().getLeft());
+						if (this.myMap.sendNodeEdges(c.getLeft().getRight()).getLeft() > 1)
+							golems.add(c.getLeft().getRight());
+					}
+				}
+				
+				for (String golemC : golems) {
+					List<String> path = this.myMap.shortestPathNewMap(myPosition, golemC, others);
+					
+					if (path!=null) {
+						if (!path.isEmpty()) {
+							nextNode = path.get(0);
+							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(new Couple<List<String>, String>(others, golemC));
+						}
+					}
+				}
+				
+				System.out.println(this.myAgent.getLocalName() + " -- 3");
 			}
 			
 			else if (givenPGolem) {
+				Couple<List<String>,String> c = ((ExploreMultiAgent)this.myAgent).getGivenPosGolem();
 				
+				System.out.println(this.myAgent.getLocalName() + " -- 4");
+				nextNode = this.myMap.shortestPathNewMap(myPosition, c.getRight(), c.getLeft()).get(0);
 			}
 			
 			else if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty()) {
@@ -154,6 +211,8 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 						nextNode = this.myMap.getShortestPath(myPosition, node).get(0);
 					}
 				}
+				
+				System.out.println(this.myAgent.getLocalName() + " -- 5");
 			}
 			
 			else {
@@ -216,7 +275,8 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					
 					nextNode = nodesStench.get(na);
 				}
-
+				
+				System.out.println(this.myAgent.getLocalName() + " -- 6");
 			}
 			
 			((ExploreMultiAgent)this.myAgent).setLastPosition(myPosition);

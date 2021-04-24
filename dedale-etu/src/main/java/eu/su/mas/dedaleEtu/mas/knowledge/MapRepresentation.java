@@ -25,6 +25,7 @@ import org.graphstream.ui.view.Viewer.CloseFramePolicy;
 
 import dataStructures.serializableGraph.*;
 import dataStructures.tuple.Couple;
+import eu.su.mas.dedale.mas.agent.knowledge.MapRepresentation.MapAttribute;
 import javafx.application.Platform;
 
 /**
@@ -356,6 +357,116 @@ public class MapRepresentation implements Serializable {
 		}
 		
 		return new Couple<Integer,List<String>>(count, nodes);
+	}
+	
+	
+	/**
+	 * Return a clone of the map without the nodes listed and their edges.
+	 */
+	public List<String> shortestPathNewMap(String idFrom,String idTo,List<String> nodesId) {
+		
+	/**
+	 *	MapRepresentation newMap = new MapRepresentation();
+		
+		for (Object node : this.g.nodes().toArray()) {
+			boolean add = true;
+			
+			for (String id : nodesId) {
+				if (((Node) node).getId().equals(id))
+					add = false;
+			}
+			
+			if (add)
+				newMap.addNode(((Node) node).getId(), MapAttribute.closed);
+		}
+		
+		
+		for (Object e : this.g.edges().toArray()) {
+			boolean add = true;
+				
+			for (String id : nodesId) {
+				if (((Edge) e).getNode0().getId().equals(id)) {
+					add = false;
+				}
+				else if (((Edge) e).getNode1().getId().equals(id)) {
+					add = false;
+				}
+			}
+			
+			if (add) {
+				newMap.addEdge(((Edge) e).getNode0().getId(), ((Edge) e).getNode1().getId());
+			}
+		}
+		
+		List<String> path = newMap.getShortestPath(idFrom, idTo);
+	
+		return path;
+	*/
+		
+		List<String> path = new ArrayList<String>();
+		List<String> from = new ArrayList<String>();
+		String fr = idFrom;
+		
+		from.add(idFrom);
+		
+		int compteur = 0;
+		
+		while (compteur < 20) {
+			boolean yes = false;
+			
+			for (String f : from) {
+				yes = true;
+				path = this.getShortestPath(f, idTo);
+				
+				for (String id : nodesId) {
+					if (path.contains(id))
+						yes = false;
+				}
+				
+				if (yes) {
+					path = this.getShortestPath(idFrom, f);
+					
+					for (String s : this.getShortestPath(f, idTo)) 
+						path.add(s);
+					
+					compteur = 20;
+					break;
+				}
+			}
+			
+			if (compteur == 19) {
+				path = null;
+			}
+			
+			if (!yes) {
+				List<String> remNodes = new ArrayList<String>();
+				for (String s : from)
+					remNodes.add(s);
+					
+				for (String s : remNodes) 
+					from.remove(s);
+				
+				for (String s : remNodes) {
+					for (String ss : this.sendNodeEdges(s).getRight()) {
+						boolean add = true;
+						
+						for (String id : nodesId) {
+							if (id.equals(ss)) 
+								add = false;
+							else if (this.getShortestPath(idFrom, ss).contains(id))
+								add = false;
+						}
+						
+						if (add)
+							from.add(ss);
+					}
+				}
+				
+				compteur += 1;
+			}
+		}
+		
+		return path;
 	}
 
 
