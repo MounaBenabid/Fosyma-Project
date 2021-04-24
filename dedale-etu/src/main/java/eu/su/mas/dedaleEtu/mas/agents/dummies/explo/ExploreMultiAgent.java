@@ -43,8 +43,10 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	private String nextNode;
 	private List<String> nodesStench;
 	private List<String> obsNodes;
-	private List<Couple<String, List<String>>> othNodesStench;
+	private List<Couple<Couple<String,String>, List<String>>> othNodesStench;
 	private String lastPosition;
+	private String positionGolem;
+	private Couple<List<String>, String> givenPosGolem;
 	
 
 	/**
@@ -161,15 +163,15 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		return obsNodes;
 	}
 	
-	public void setOthNodesStench(List<Couple<String, List<String>>> nodes) {
+	public void setOthNodesStench(List<Couple<Couple<String,String>, List<String>>> nodes) {
 		othNodesStench = nodes;
 	}
 	
-	public void addOthNodesStench(Couple<String, List<String>> nodes) {
+	public void addOthNodesStench(Couple<Couple<String,String>, List<String>> nodes) {
 		othNodesStench.add(nodes);
 	}
 	
-	public List<Couple<String, List<String>>> getOthNodesStench() {
+	public List<Couple<Couple<String,String>, List<String>>> getOthNodesStench() {
 		return othNodesStench;
 	}
 	
@@ -179,6 +181,22 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	
 	public String getLastPosition() {
 		return lastPosition;
+	}
+	
+	public void setPositionGolem(String p) {
+		positionGolem = p;
+	}
+	
+	public String getPositionGolem() {
+		return positionGolem;
+	}
+	
+	public void setGivenPosGolem(Couple<List<String>, String> p) {
+		givenPosGolem = p;
+	}
+	
+	public Couple<List<String>, String> getGivenPosGolem() {
+		return givenPosGolem;
 	}
 	
 	/**

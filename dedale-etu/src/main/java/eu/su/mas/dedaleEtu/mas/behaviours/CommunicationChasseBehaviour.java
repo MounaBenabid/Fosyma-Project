@@ -31,8 +31,8 @@ public class CommunicationChasseBehaviour extends OneShotBehaviour {
 		end = 0;
 		
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+		String positionGolem = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
 		
-		//String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		List<String> nodesStench = ((ExploreMultiAgent)this.myAgent).getNodesStench();
 		
 		final ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -42,7 +42,8 @@ public class CommunicationChasseBehaviour extends OneShotBehaviour {
 		for (int i=0; i<receiversNames.size(); i++) {
 			String agentName = receiversNames.get(i);
 			try {
-				msg.setContentObject(new Couple<String,List<String>>(myPosition, nodesStench));
+				Couple<String,String> couple = new Couple<String,String>(myPosition, positionGolem);
+				msg.setContentObject(new Couple<Couple<String,String>,List<String>>(couple, nodesStench));
 				msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));  
 				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 			} catch (IOException e) {

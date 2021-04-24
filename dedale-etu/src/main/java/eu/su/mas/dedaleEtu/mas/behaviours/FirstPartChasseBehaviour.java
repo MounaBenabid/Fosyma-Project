@@ -60,10 +60,45 @@ public class FirstPartChasseBehaviour extends OneShotBehaviour {
 				}
 			}
 			
+			// si l'agent est à la position où il pensait que le golem serait, alors le golem n'y est pas
+			if (((ExploreMultiAgent)this.myAgent).getPositionGolem() != null) {
+				if (((ExploreMultiAgent)this.myAgent).getPositionGolem().equals(myPosition)) {
+					((ExploreMultiAgent)this.myAgent).setPositionGolem(null);
+				}
+			}
+			
+			if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem() != null) {
+				if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight().equals(myPosition)) {
+					((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+				}
+			}
+			
+			// si l'agent n'est pas à la position vers laquelle il se dirigeait à l'itération précédente
+			if (((ExploreMultiAgent)this.myAgent).getNextNode()!=null && !((ExploreMultiAgent)this.myAgent).getNextNode().equals(myPosition)) {
+				if (!((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()) {
+					boolean same = false;
+					
+					// vérifier si on n'a pas pu atteindre la position parce qu'un autre agent y était
+					for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+						if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getNextNode()))
+							same = true;
+					}
+					
+					// sinon, un golem y est
+					if (!same) {
+						((ExploreMultiAgent)this.myAgent).setPositionGolem(((ExploreMultiAgent)this.myAgent).getNextNode());
+					}
+				}
+				
+				else {
+					((ExploreMultiAgent)this.myAgent).setPositionGolem(((ExploreMultiAgent)this.myAgent).getNextNode());
+				}
+			}
+			
 			((ExploreMultiAgent)this.myAgent).setNodesStench(nodesStench);
 			((ExploreMultiAgent)this.myAgent).setObsNodes(obsNodes);
 			
-			List<Couple<String, List<String>>> n = new ArrayList<Couple<String, List<String>>>();
+			List<Couple<Couple<String,String>, List<String>>> n = new ArrayList<Couple<Couple<String,String>, List<String>>>();
 			((ExploreMultiAgent)this.myAgent).setOthNodesStench(n);
 		}
 	}

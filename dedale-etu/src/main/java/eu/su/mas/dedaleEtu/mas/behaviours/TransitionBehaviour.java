@@ -57,9 +57,10 @@ public class TransitionBehaviour extends OneShotBehaviour {
 		fsmChasse.registerDefaultTransition("cmCB", "fpCB");
 		fsmChasse.registerTransition("cmCB", "lsB", 1);
 		
+		((ExploreMultiAgent)this.myAgent).setNextNode(null);
 		
 		/***
-		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
+		 * ADD BEHAVIOUR TO THE AGENT
 		 */
 		this.myAgent.addBehaviour(fsmChasse);
 		

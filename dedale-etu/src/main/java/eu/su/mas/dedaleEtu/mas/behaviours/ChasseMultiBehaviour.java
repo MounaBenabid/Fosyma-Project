@@ -30,12 +30,58 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 	public void action() {
 		
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-	
+		
+		
 		if (myPosition!=null){
 			
 			String nextNode = null;
 			
-			if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty() && ((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()) {
+			boolean givenGolem = false;
+			boolean golem = false;
+			boolean givenPGolem = false;
+			
+			for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+				if (c.getLeft().getRight() != null) {
+					givenGolem = true;
+				}
+			}
+			
+			if (((ExploreMultiAgent)this.myAgent).getPositionGolem() != null) {
+				golem = false;
+				
+				for (String node : ((ExploreMultiAgent)this.myAgent).getNodesStench()) {
+					if (((ExploreMultiAgent)this.myAgent).getPositionGolem().equals(node))
+						golem = true;
+				}
+				
+				for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+					if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getPositionGolem())) {
+						golem = false;
+						((ExploreMultiAgent)this.myAgent).setPositionGolem(null);
+					}
+				}
+			}
+			
+			if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem() != null) {
+				givenPGolem = true;
+				
+				for (String s : ((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getLeft()) {
+					if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().equals(s)) {
+						givenPGolem = false;
+						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+					}
+				}
+				
+				for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+					if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getPositionGolem())) {
+						givenPGolem = false;
+						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+					}
+				}
+			}
+			
+			if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty() && ((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()
+					&& !givenPGolem) {
 				
 				List<String> nodes = ((ExploreMultiAgent)this.myAgent).getObsNodes();
 				List<String> remNodes = new ArrayList<String>();
@@ -74,12 +120,24 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				nextNode = nodes.get(na);
 			}
 			
+			else if (golem) {
+				nextNode = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
+			}
+			
+			else if (givenGolem) {
+				
+			}
+			
+			else if (givenPGolem) {
+				
+			}
+			
 			else if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty()) {
 				
-				List<Couple<String, List<String>>> othNodesStench = ((ExploreMultiAgent)this.myAgent).getOthNodesStench();
+				List<Couple<Couple<String,String>, List<String>>> othNodesStench = ((ExploreMultiAgent)this.myAgent).getOthNodesStench();
 				List<String> nodesStench = new ArrayList<String>();
 				
-				for (Couple<String, List<String>> l : othNodesStench) {
+				for (Couple<Couple<String,String>, List<String>> l : othNodesStench) {
 					for (String s : l.getRight()) {
 						if (!nodesStench.contains(s)) 
 							nodesStench.add(s);
@@ -123,10 +181,15 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					}
 				}
 				
-				// si on n'a qu'une feuille avec une odeur mais plus d'une feuille observables, le golem est dans la feuille
-				// on ne bouge pas
+				// si on n'a qu'une feuille avec une odeur mais plus d'une feuille observables, le golem est peut-être dans la feuille
+				// on essaye d'aller dans la feuille
 				if (fs == 1 && f > 1) {
-					nextNode = myPosition;
+					for (String node : obsNodes) {
+						Couple<Integer, List<String>> l = this.myMap.sendNodeEdges(node);
+						if (l.getLeft() == 1) {
+							nextNode = node;
+						}
+					}
 				}
 					
 				else {
