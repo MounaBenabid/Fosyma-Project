@@ -68,6 +68,7 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight().equals(s)) {
 						givenPGolem = false;
 						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+						break;
 					}
 				}
 				
@@ -76,6 +77,7 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 						if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
 							givenPGolem = false;
 							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+							break;
 						}
 					}
 				}
