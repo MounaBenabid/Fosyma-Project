@@ -71,10 +71,12 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					}
 				}
 				
-				for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
-					if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
-						givenPGolem = false;
-						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+				if (givenPGolem) {
+					for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+						if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
+							givenPGolem = false;
+							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+						}
 					}
 				}
 			}
