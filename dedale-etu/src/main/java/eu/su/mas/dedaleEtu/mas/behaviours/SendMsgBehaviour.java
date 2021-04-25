@@ -1,5 +1,7 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.util.List;
+
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreSoloAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreMultiAgent;
@@ -19,12 +21,12 @@ public class SendMsgBehaviour extends SimpleBehaviour{
 	/**
 	 * Name of the agent that should receive the values
 	 */
-	private String receiverName;
+	private List<String> receiversNames;
 	
 	
-	public SendMsgBehaviour(final AbstractDedaleAgent myagent, String receiverName) {
+	public SendMsgBehaviour(final AbstractDedaleAgent myagent, List<String> receiversNames) {
 		super(myagent);
-		this.receiverName=receiverName;
+		this.receiversNames=receiversNames;
 		
 	}
 
@@ -32,15 +34,16 @@ public class SendMsgBehaviour extends SimpleBehaviour{
 		
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
-		final ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setSender(this.myAgent.getAID());
-		
-		//System.out.println("<---- test sendping ");
-		if (myPosition!=""){
+		for (int i=0; i<receiversNames.size(); i++) {
+			String agentName = receiversNames.get(i);
+			final ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			msg.setProtocol("PING");
+			msg.setSender(this.myAgent.getAID());
 			
-			msg.setContent(((ExploreMultiAgent)this.myAgent).getNextNode());
-			//msg.setContent(myPosition);
-			msg.addReceiver(new AID(this.receiverName, AID.ISLOCALNAME));  
+			//System.out.println("<---- test sendping ");
+			msg.setContent(myPosition);
+			//msg.setContent(((ExploreMultiAgent)this.myAgent).getNextNode());
+			msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));  
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		}
 	}
@@ -53,8 +56,12 @@ public class SendMsgBehaviour extends SimpleBehaviour{
 		
 		if (msg != null) {		
 			System.out.println(this.myAgent.getLocalName()+ "<---- Got answer from "+msg.getSender().getLocalName()+", content= "+msg.getContent());
-			if (msg.getSender().getLocalName().equals(receiverName))
-				this.getAnswer = true;
+			for (String receiverName:receiversNames) {
+				if (msg.getSender().getLocalName().equals(receiverName))
+					this.getAnswer = true;
+					SendMapBehaviour sendMapB = new SendMapBehaviour(((AbstractDedaleAgent)this.myAgent), receiverName);
+					((ExploreMultiAgent)this.myAgent).addBehaviour(sendMapB);
+			}
 		}
 		else {
 			this.getAnswer = false;
