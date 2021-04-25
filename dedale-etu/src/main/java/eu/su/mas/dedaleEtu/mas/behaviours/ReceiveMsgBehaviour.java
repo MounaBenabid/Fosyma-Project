@@ -23,7 +23,9 @@ public class ReceiveMsgBehaviour extends SimpleBehaviour {
 	public void getPing() {
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
-		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+		final MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("PING"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 									
 		final ACLMessage msg = this.myAgent.receive(msgTemplate);
 		//System.out.println("<---- test receiveping ");

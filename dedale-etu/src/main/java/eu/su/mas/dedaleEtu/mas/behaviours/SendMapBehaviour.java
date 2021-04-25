@@ -33,10 +33,9 @@ public class SendMapBehaviour extends SimpleBehaviour implements Serializable{
 	private MapRepresentation myMap;
 	
 	
-	public SendMapBehaviour(final AbstractDedaleAgent myagent, String receiverName, MapRepresentation myMap) {
+	public SendMapBehaviour(final AbstractDedaleAgent myagent, String receiverName) {
 		super(myagent);
 		this.receiverName=receiverName;
-		this.myMap = myMap;
 	}
 
 
