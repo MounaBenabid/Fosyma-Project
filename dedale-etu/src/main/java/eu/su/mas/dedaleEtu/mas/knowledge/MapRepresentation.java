@@ -411,7 +411,7 @@ public class MapRepresentation implements Serializable {
 		
 		int compteur = 0;
 		
-		while (compteur < 20) {
+		while (compteur < 10) {
 			boolean yes = false;
 			
 			for (String f : from) {
@@ -429,12 +429,12 @@ public class MapRepresentation implements Serializable {
 					for (String s : this.getShortestPath(f, idTo)) 
 						path.add(s);
 					
-					compteur = 20;
+					compteur = 10;
 					break;
 				}
 			}
 			
-			if (compteur == 19) {
+			if (compteur == 9) {
 				path = null;
 			}
 			
