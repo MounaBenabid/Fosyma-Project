@@ -403,7 +403,7 @@ public class MapRepresentation implements Serializable {
 		return path;
 	*/
 		
-		List<String> path = new ArrayList<String>();
+	/*	List<String> path = new ArrayList<String>();
 		List<String> from = new ArrayList<String>();
 		String fr = idFrom;
 		
@@ -467,6 +467,73 @@ public class MapRepresentation implements Serializable {
 		}
 		
 		return path;
+	*/
+		List<String> remNodes = new ArrayList<String>();
+		
+		for (String id : nodesId) {
+			if (idFrom.equals(id))
+				remNodes.add(id);
+		}
+		
+		for (String id : remNodes) {
+			nodesId.remove(id);
+		}
+		
+		Graph ng = new SingleGraph("New graph");
+		
+		for (Object node : this.g.nodes().toArray()) {
+			boolean add = true;
+			
+			for (String id : nodesId) {
+				if (((Node) node).getId().equals(id)) {
+					add = false;
+				}
+			}
+			
+			if (add) {
+				ng.addNode(((Node) node).getId());
+			}
+		}
+		
+		for (Object edge : this.g.edges().toArray()) {
+			boolean add = true;
+			
+			for (String id : nodesId) {
+				if (((Edge) edge).getNode0().getId().equals(id)) {
+					add = false;
+				}
+				else if (((Edge) edge).getNode1().getId().equals(id)) {
+					add = false;
+				}
+			}
+			
+			if (add) {
+				ng.addEdge(((Edge) edge).getId(), ng.getNode(((Edge) edge).getNode0().getId()), ng.getNode(((Edge) edge).getNode1().getId()));
+			}
+		}
+		
+		ng.nodes().forEach(n -> n.setAttribute("label", n.getId()));
+		ng.edges().forEach(e -> e.setAttribute("label", e.getId()));
+		
+		List<String> shortestPath=new ArrayList<String>();
+
+		Dijkstra dijkstra = new Dijkstra();//number of edge
+		dijkstra.init(ng);
+		dijkstra.setSource(ng.getNode(idFrom));
+		dijkstra.compute();//compute the distance to all nodes from idFrom
+		List<Node> path=dijkstra.getPath(ng.getNode(idTo)).getNodePath(); //the shortest path from idFrom to idTo
+		Iterator<Node> iter=path.iterator();
+		while (iter.hasNext()){
+			shortestPath.add(iter.next().getId());
+		}
+		dijkstra.clear();
+		if (shortestPath.isEmpty()) {//The openNode is not currently reachable
+			return null;
+		}else {
+			shortestPath.remove(0);//remove the current position
+		}
+		return shortestPath;
+		
 	}
 
 
