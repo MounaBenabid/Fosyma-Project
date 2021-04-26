@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
-import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreMultiAgent;
-import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.AMSService;
@@ -28,7 +25,6 @@ public class TransitionBehaviour extends OneShotBehaviour {
 	
 	@Override
 	public void action() {
-		List<Behaviour> lb=new ArrayList<Behaviour>();
 		
 		List <String> agentsNames = new ArrayList<String>();
 		
@@ -42,18 +38,25 @@ public class TransitionBehaviour extends OneShotBehaviour {
 		
 		FSMBehaviour fsmChasse = new FSMBehaviour(this.myAgent);
 		FirstPartChasseBehaviour fpCB = new FirstPartChasseBehaviour(this.myAgent);
+		ReceivePingExploChasseBehaviour rpeCB = new ReceivePingExploChasseBehaviour(this.myAgent);
+		ReceiveMsgChasseBehaviour rmCB = new ReceiveMsgChasseBehaviour(this.myAgent);
 		CommunicationChasseBehaviour cCB = new CommunicationChasseBehaviour(this.myAgent, agentsNames);
 		ChasseMultiBehaviour cmCB = new ChasseMultiBehaviour(this.myAgent);
 		LastStateBehaviour lsB = new LastStateBehaviour();
 		
 		fsmChasse.registerFirstState(fpCB, "fpCB");
+		fsmChasse.registerState(rpeCB, "rpeCB");
+		fsmChasse.registerState(rmCB, "rmCB");
 		fsmChasse.registerState(cCB, "cCB");
 		fsmChasse.registerState(cmCB, "cmCB");
 		fsmChasse.registerLastState(lsB, "lsB");
 		
 		fsmChasse.registerDefaultTransition("fpCB", "cmCB");
+		fsmChasse.registerTransition("fpCB", "rpeCB", 0);
 		fsmChasse.registerTransition("fpCB", "cCB", 1);
-		fsmChasse.registerDefaultTransition("cCB", "cmCB");
+		fsmChasse.registerDefaultTransition("rpeCB", "rmCB");
+		fsmChasse.registerDefaultTransition("rmCB", "cmCB");
+		fsmChasse.registerDefaultTransition("cCB", "rpeCB");
 		fsmChasse.registerDefaultTransition("cmCB", "fpCB");
 		fsmChasse.registerTransition("cmCB", "lsB", 1);
 		

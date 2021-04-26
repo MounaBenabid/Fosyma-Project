@@ -56,12 +56,12 @@ public class SendMsgBehaviour extends SimpleBehaviour{
 		
 		if (msg != null) {		
 			System.out.println(this.myAgent.getLocalName()+ "<---- Got answer from "+msg.getSender().getLocalName()+", content= "+msg.getContent());
-			for (String receiverName:receiversNames) {
-				if (msg.getSender().getLocalName().equals(receiverName))
-					this.getAnswer = true;
-					SendMapBehaviour sendMapB = new SendMapBehaviour(((AbstractDedaleAgent)this.myAgent), receiverName);
-					((ExploreMultiAgent)this.myAgent).addBehaviour(sendMapB);
-			}
+			//for (String receiverName:receiversNames) {
+				//if (msg.getSender().getLocalName().equals(receiverName))
+			this.getAnswer = true;
+			SendMapBehaviour sendMapB = new SendMapBehaviour(((AbstractDedaleAgent)this.myAgent), msg.getSender().getLocalName());
+			((ExploreMultiAgent)this.myAgent).addBehaviour(sendMapB);
+			//}
 		}
 		else {
 			this.getAnswer = false;

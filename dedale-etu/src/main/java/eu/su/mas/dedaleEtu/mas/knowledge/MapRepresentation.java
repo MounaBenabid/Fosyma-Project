@@ -479,8 +479,10 @@ public class MapRepresentation implements Serializable {
 			nodesId.remove(id);
 		}
 		
-		Graph ng = new SingleGraph("New graph");
 		
+		Graph ng = new SingleGraph("New graph");
+	
+	/*
 		for (Object node : this.g.nodes().toArray()) {
 			boolean add = true;
 			
@@ -511,27 +513,67 @@ public class MapRepresentation implements Serializable {
 				ng.addEdge(((Edge) edge).getId(), ng.getNode(((Edge) edge).getNode0().getId()), ng.getNode(((Edge) edge).getNode1().getId()));
 			}
 		}
+	
+	*/
+		
+		for (Object node : this.g.nodes().toArray()) {
+			ng.addNode(((Node) node).getId());
+		}
+		
+		for (Object edge : this.g.edges().toArray()) {
+			boolean add = true;
+			
+			for (String id : nodesId) {
+				if (((Edge) edge).getNode0().getId().equals(id)) {
+					add = false;
+				}
+				else if (((Edge) edge).getNode1().getId().equals(id)) {
+					add = false;
+				}
+			}
+			
+			if (add) {
+				ng.addEdge(((Edge) edge).getId(), ng.getNode(((Edge) edge).getNode0().getId()), ng.getNode(((Edge) edge).getNode1().getId()))
+				.setAttribute("length", 1);
+			}
+			
+			else {
+				ng.addEdge(((Edge) edge).getId(), ng.getNode(((Edge) edge).getNode0().getId()), ng.getNode(((Edge) edge).getNode1().getId()))
+				.setAttribute("length", 100);
+			}
+		}
 		
 		ng.nodes().forEach(n -> n.setAttribute("label", n.getId()));
-		ng.edges().forEach(e -> e.setAttribute("label", e.getId()));
+		ng.edges().forEach(e -> e.setAttribute("label", "" + (int) e.getNumber("length")));
 		
 		List<String> shortestPath=new ArrayList<String>();
 
-		Dijkstra dijkstra = new Dijkstra();//number of edge
+		Dijkstra dijkstra = new Dijkstra(Dijkstra.Element.EDGE, null, "length");//length of edges
 		dijkstra.init(ng);
 		dijkstra.setSource(ng.getNode(idFrom));
 		dijkstra.compute();//compute the distance to all nodes from idFrom
-		List<Node> path=dijkstra.getPath(ng.getNode(idTo)).getNodePath(); //the shortest path from idFrom to idTo
-		Iterator<Node> iter=path.iterator();
-		while (iter.hasNext()){
-			shortestPath.add(iter.next().getId());
+		List<Node> path;
+		try {
+			path=dijkstra.getPath(ng.getNode(idTo)).getNodePath(); //the shortest path from idFrom to idTo
+			Iterator<Node> iter=path.iterator();
+			while (iter.hasNext()){
+				shortestPath.add(iter.next().getId());
+			}
+			dijkstra.clear();
+			if (shortestPath.isEmpty()) {//The openNode is not currently reachable
+				return null;
+			}else {
+				shortestPath.remove(0);//remove the current position
+			}
+		} catch (NullPointerException exc) {
+			for (Object n : ng.nodes().toArray()){
+				System.out.println(((Node) n).getId());
+				for (Object e : ((Node) n).edges().toArray()) {
+					System.out.println(((Edge) e).getId() + " " + ((Edge) e).getNode0().getId() + " " + ((Edge) e).getNode1().getId());
+				}
+			}
 		}
-		dijkstra.clear();
-		if (shortestPath.isEmpty()) {//The openNode is not currently reachable
-			return null;
-		}else {
-			shortestPath.remove(0);//remove the current position
-		}
+		
 		return shortestPath;
 		
 	}

@@ -8,6 +8,8 @@ import jade.core.behaviours.OneShotBehaviour;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Observation;
 
@@ -71,27 +73,53 @@ public class FirstPartChasseBehaviour extends OneShotBehaviour {
 				if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight().equals(myPosition)) {
 					((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
 				}
+				
+				else if (obsNodes.contains(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
+					if (nodesStench.isEmpty()) {
+						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+					}
+					else {
+						if (!nodesStench.contains(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
+							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+						}
+					}
+				}
+				
+				else if (!((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()) {
+					for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+						if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
+							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+							break;
+						}
+					}
+				}
 			}
 			
 			// si l'agent n'est pas à la position vers laquelle il se dirigeait à l'itération précédente
 			if (((ExploreMultiAgent)this.myAgent).getNextNode()!=null && !((ExploreMultiAgent)this.myAgent).getNextNode().equals(myPosition)) {
-				if (!((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()) {
-					boolean same = false;
-					
-					// vérifier si on n'a pas pu atteindre la position parce qu'un autre agent y était
-					for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
-						if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getNextNode()))
-							same = true;
+				if (!nodesStench.isEmpty()) {
+					if (nodesStench.contains(((ExploreMultiAgent)this.myAgent).getNextNode())) {	
+						if (!((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()) {
+							boolean same = false;
+							
+							// vérifier si on n'a pas pu atteindre la position parce qu'un autre agent y était
+							for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+								if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getNextNode()))
+									same = true;
+							}
+							
+							// sinon, un golem y est
+							if (!same) {
+								((ExploreMultiAgent)this.myAgent).setPositionGolem(((ExploreMultiAgent)this.myAgent).getNextNode());
+								((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+							}
+						}
+						
+						else {
+							((ExploreMultiAgent)this.myAgent).setPositionGolem(((ExploreMultiAgent)this.myAgent).getNextNode());
+							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+						}
 					}
-					
-					// sinon, un golem y est
-					if (!same) {
-						((ExploreMultiAgent)this.myAgent).setPositionGolem(((ExploreMultiAgent)this.myAgent).getNextNode());
-					}
-				}
-				
-				else {
-					((ExploreMultiAgent)this.myAgent).setPositionGolem(((ExploreMultiAgent)this.myAgent).getNextNode());
 				}
 			}
 			

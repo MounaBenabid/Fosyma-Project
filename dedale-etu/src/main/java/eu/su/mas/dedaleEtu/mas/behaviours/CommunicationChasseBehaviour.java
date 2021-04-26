@@ -35,7 +35,7 @@ public class CommunicationChasseBehaviour extends SimpleBehaviour {
 		
 		List<String> nodesStench = ((ExploreMultiAgent)this.myAgent).getNodesStench();
 		
-		final ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol("CHASSE-STENCH");
 		msg.setSender(this.myAgent.getAID());
 		
@@ -53,7 +53,7 @@ public class CommunicationChasseBehaviour extends SimpleBehaviour {
 	}
 	
 	private void getMsg() {
-		final MessageTemplate msgTemplate = MessageTemplate.and(
+		MessageTemplate msgTemplate = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("CHASSE-STENCH"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 											

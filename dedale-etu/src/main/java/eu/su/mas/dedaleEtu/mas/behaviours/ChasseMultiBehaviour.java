@@ -99,11 +99,22 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				givenGolem = false;
 				
 				for (String golemC : golems) {
-					List<String> path = this.myMap.shortestPathNewMap(myPosition, golemC, others);
-					
-					if (path!=null)
-						if (!path.isEmpty())
-							givenGolem = true;
+					if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem() != null){
+						if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight().equals(golemC)) {
+							List<String> path = this.myMap.shortestPathNewMap(myPosition, golemC, others);
+							
+							if (path!=null)
+								if (!path.isEmpty())
+									givenGolem = true;
+						}
+					}
+					else {
+						List<String> path = this.myMap.shortestPathNewMap(myPosition, golemC, others);
+						
+						if (path!=null)
+							if (!path.isEmpty())
+								givenGolem = true;
+					}
 				}
 					
 			}
@@ -195,27 +206,71 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 			
 			else if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty()) {
 				
+				if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem() != null)
+					System.out.println(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight());
 				List<Couple<Couple<String,String>, List<String>>> othNodesStench = ((ExploreMultiAgent)this.myAgent).getOthNodesStench();
-				List<String> nodesStench = new ArrayList<String>();
+				List<Couple<String,Integer>> nodesStench = new ArrayList<Couple<String,Integer>>();
 				
 				for (Couple<Couple<String,String>, List<String>> l : othNodesStench) {
 					for (String s : l.getRight()) {
-						if (!nodesStench.contains(s)) 
-							nodesStench.add(s);
+						if (!nodesStench.contains(s)) {
+							List<String> path = this.myMap.getShortestPath(myPosition, s);
+							if ((path.size() != 0) && !path.isEmpty()) {
+								if (((ExploreMultiAgent)this.myAgent).getObsNodes().contains(path.get(0))) {
+									nodesStench.add(new Couple<String, Integer>(s, path.size()));
+								}
+							}
+						}
 					}
 				}
 				
+				if (nodesStench.isEmpty()) {
+					int size = ((ExploreMultiAgent)this.myAgent).getObsNodes().size();
+					
+					Random rand = new Random();
+					
+					int na = rand.nextInt(size);
+					
+					nextNode = ((ExploreMultiAgent)this.myAgent).getObsNodes().get(na);
+				}
+				else {
+					int smallest = Integer.MAX_VALUE;
+					String s = nodesStench.get(0).getLeft();
+					
+					for (Couple<String, Integer> node : nodesStench) {
+						int size = node.getRight();
+						
+						if (size < smallest) {
+							smallest = size;
+							s = node.getLeft();
+						}
+					}
+					
+					nextNode = this.myMap.getShortestPath(myPosition, s).get(0);
+				}
+				/*	
+					System.out.println(nextNode + " is nextNode, and ");
+					for (String s : ((ExploreMultiAgent)this.myAgent).getObsNodes()) {
+						System.out.println(s);
+					}
+				*/
+				
+			
+			/*
 				int smallest = Integer.MAX_VALUE;
 				
 				for (String node : nodesStench) {
-					int size = this.myMap.getShortestPath(myPosition, node).size();
+					List<String> path = this.myMap.getShortestPath(myPosition, node);
+					int size = path.size();
 					
-					if (size < smallest) {
-						smallest = size;
-						nextNode = this.myMap.getShortestPath(myPosition, node).get(0);
+					if (size != 0) {
+						if (size < smallest) {
+							smallest = size;
+							nextNode = path.get(0);
+						}
 					}
 				}
-				
+			*/	
 				System.out.println(this.myAgent.getLocalName() + " -- 5");
 			}
 			
