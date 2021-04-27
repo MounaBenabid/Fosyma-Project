@@ -40,11 +40,12 @@ public class CommunicationBehaviour extends ParallelBehaviour {
 		fsmReceive.registerTransition("getPing", "end", 0);
 		
 		addSubBehaviour(fsmReceive);
-		
+	/*	
 		if(receiveMsgB.onEnd() == 1) {
 			if(receiveMapB.onEnd() == 0) 
 				end = 0;
 		}
+	*/
 	}
 
 	@Override

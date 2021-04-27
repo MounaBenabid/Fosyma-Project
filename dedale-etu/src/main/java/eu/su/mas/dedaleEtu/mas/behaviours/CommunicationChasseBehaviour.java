@@ -63,6 +63,29 @@ public class CommunicationChasseBehaviour extends SimpleBehaviour {
 			try {
 				Couple<Couple<String,String>, List<String>> o = (Couple<Couple<String,String>, List<String>>) msg.getContentObject();					
 				((ExploreMultiAgent)this.myAgent).addOthNodesStench(o);
+				
+				if (((ExploreMultiAgent)this.myAgent).getCompteur() >= 50) {
+					Couple<String,String> remCouple = null;
+					for (Couple<String,String> c : ((ExploreMultiAgent)this.myAgent).getFinish()) {
+						if (c.getLeft().equals(msg.getSender().getLocalName())) {
+							if (!o.getLeft().getLeft().equals(c.getRight())) {
+								remCouple = c;
+							}
+						}
+					}
+					
+					((ExploreMultiAgent)this.myAgent).removeFinish(remCouple);
+					String posGolem = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
+					if (o.getLeft().getRight() != null) {
+						if (o.getLeft().getRight().equals(posGolem)) {
+							Couple<Integer, List<String>> c = ((ExploreMultiAgent)this.myAgent).getMyMap().sendNodeEdges(posGolem);
+							if (c.getRight().contains(o.getLeft().getLeft())) {
+								((ExploreMultiAgent)this.myAgent).addFinish(new Couple<String,String>(msg.getSender().getLocalName(), o.getLeft().getLeft()));
+							}
+						}
+					}
+				}
+				
 			} catch (UnreadableException e) {
 				e.printStackTrace();
 			}

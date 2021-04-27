@@ -42,6 +42,7 @@ public class TransitionBehaviour extends OneShotBehaviour {
 		ReceiveMsgChasseBehaviour rmCB = new ReceiveMsgChasseBehaviour(this.myAgent);
 		CommunicationChasseBehaviour cCB = new CommunicationChasseBehaviour(this.myAgent, agentsNames);
 		ChasseMultiBehaviour cmCB = new ChasseMultiBehaviour(this.myAgent);
+		VictoryChasseBehaviour vCB = new VictoryChasseBehaviour(this.myAgent);
 		LastStateBehaviour lsB = new LastStateBehaviour();
 		
 		fsmChasse.registerFirstState(fpCB, "fpCB");
@@ -49,14 +50,17 @@ public class TransitionBehaviour extends OneShotBehaviour {
 		fsmChasse.registerState(rmCB, "rmCB");
 		fsmChasse.registerState(cCB, "cCB");
 		fsmChasse.registerState(cmCB, "cmCB");
+		fsmChasse.registerState(vCB, "vCB");
 		fsmChasse.registerLastState(lsB, "lsB");
 		
 		fsmChasse.registerDefaultTransition("fpCB", "cmCB");
 		fsmChasse.registerTransition("fpCB", "rpeCB", 0);
 		fsmChasse.registerTransition("fpCB", "cCB", 1);
+		fsmChasse.registerTransition("fpCB", "vCB", 2);
 		fsmChasse.registerDefaultTransition("rpeCB", "rmCB");
 		fsmChasse.registerDefaultTransition("rmCB", "cmCB");
 		fsmChasse.registerDefaultTransition("cCB", "rpeCB");
+		fsmChasse.registerDefaultTransition("vCB", "fpCB");
 		fsmChasse.registerDefaultTransition("cmCB", "fpCB");
 		fsmChasse.registerTransition("cmCB", "lsB", 1);
 		

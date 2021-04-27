@@ -66,6 +66,8 @@ public class FirstPartChasseBehaviour extends OneShotBehaviour {
 			if (((ExploreMultiAgent)this.myAgent).getPositionGolem() != null) {
 				if (((ExploreMultiAgent)this.myAgent).getPositionGolem().equals(myPosition)) {
 					((ExploreMultiAgent)this.myAgent).setPositionGolem(null);
+					((ExploreMultiAgent)this.myAgent).reinitializeCompteur();
+					((ExploreMultiAgent)this.myAgent).reinitializeFinish();
 				}
 			}
 			
@@ -123,12 +125,44 @@ public class FirstPartChasseBehaviour extends OneShotBehaviour {
 				}
 			}
 			
+			if (((ExploreMultiAgent)this.myAgent).getCompteur() >= 50) {
+				if (this.myMap.sendNodeEdges(((ExploreMultiAgent)this.myAgent).getPositionGolem()).getLeft() == 1) {
+					end = 2;
+				}
+				else {
+					if (didIFinish(myPosition)) {
+						end = 2;
+					}
+				}
+			}
+			
 			((ExploreMultiAgent)this.myAgent).setNodesStench(nodesStench);
 			((ExploreMultiAgent)this.myAgent).setObsNodes(obsNodes);
 			
 			List<Couple<Couple<String,String>, List<String>>> n = new ArrayList<Couple<Couple<String,String>, List<String>>>();
 			((ExploreMultiAgent)this.myAgent).setOthNodesStench(n);
 		}
+	}
+	
+	public boolean didIFinish(String myPosition) {
+		boolean f = true;
+		
+		List<String> temp = new ArrayList<String>();
+		
+		temp.add(myPosition);
+		
+		for (Couple<String,String> c : ((ExploreMultiAgent)this.myAgent).getFinish()) {
+			temp.add(c.getRight());
+		}
+		
+		Couple<Integer, List<String>> c = this.myMap.sendNodeEdges(((ExploreMultiAgent)this.myAgent).getPositionGolem());
+		
+		for (String s : c.getRight()) {
+			if (!temp.contains(s))
+				f = false;
+		}
+		
+		return f;
 	}
 
 	public boolean containsStench(List<Couple<Observation, Integer>> L){

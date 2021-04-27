@@ -34,25 +34,27 @@ public class SendMsgBehaviour extends SimpleBehaviour{
 		
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setProtocol("PING");
+		msg.setSender(this.myAgent.getAID());
+		
+		//System.out.println("<---- test sendping ");
+		msg.setContent(myPosition);
+		
 		for (int i=0; i<receiversNames.size(); i++) {
 			String agentName = receiversNames.get(i);
-			final ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.setProtocol("PING");
-			msg.setSender(this.myAgent.getAID());
-			
-			//System.out.println("<---- test sendping ");
-			msg.setContent(myPosition);
 			//msg.setContent(((ExploreMultiAgent)this.myAgent).getNextNode());
 			msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));  
-			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		}
+		
+		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 	}
 	
 	
 	public void getAnswer() {
-		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.CONFIRM);
+		MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.CONFIRM);
 		
-		final ACLMessage msg = this.myAgent.receive(msgTemplate);
+		ACLMessage msg = this.myAgent.receive(msgTemplate);
 		
 		if (msg != null) {		
 			System.out.println(this.myAgent.getLocalName()+ "<---- Got answer from "+msg.getSender().getLocalName()+", content= "+msg.getContent());

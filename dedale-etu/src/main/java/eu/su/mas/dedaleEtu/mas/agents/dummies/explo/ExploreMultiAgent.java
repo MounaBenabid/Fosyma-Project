@@ -9,17 +9,11 @@ import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.CommunicationBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.FirstPartExploBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.LastStateBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveMapBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveMsgBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.SendMapBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.SendMsgBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.TransitionBehaviour;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
-import jade.core.behaviours.ParallelBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
@@ -48,6 +42,10 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	private String lastPosition;
 	private String positionGolem;
 	private Couple<List<String>, String> givenPosGolem;
+	private int compteurGolem;
+	private List<Couple<String,String>> finish;
+	private Couple<Integer,Integer> compteurPartir;
+	private String posGolemPartir;
 	
 
 	/**
@@ -64,6 +62,9 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		this.initializeOtherAgentsPos();
 		
 		lastPosition = null;
+		compteurGolem = 0;
+		this.reinitializeFinish();
+		this.reinitializeCompteurPartir();
 		
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 	
@@ -198,6 +199,64 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	
 	public Couple<List<String>, String> getGivenPosGolem() {
 		return givenPosGolem;
+	}
+	
+	public void addCompteur() {
+		compteurGolem += 1;
+	}
+	
+	public void reinitializeCompteur() {
+		compteurGolem = 0;
+	}
+	
+	public int getCompteur() {
+		return compteurGolem;
+	}
+	
+	public void addFinish(Couple<String,String> s) {
+		finish.add(s);
+	}
+	
+	public void removeFinish(Couple<String,String> s) {
+		finish.remove(s);
+	}
+	
+	public void reinitializeFinish() {
+		finish = new ArrayList<Couple<String,String>>();
+	}
+	
+	public List<Couple<String,String>> getFinish() {
+		return finish;
+	}
+	
+	public void addLCompteurPartir() {
+		int one = compteurPartir.getLeft() + 1;
+		int two = compteurPartir.getRight();
+		
+		compteurPartir = new Couple<Integer,Integer>(one,two);
+	}
+	
+	public void addRCompteurPartir() {
+		int one = compteurPartir.getLeft();
+		int two = compteurPartir.getRight() + 1;
+		
+		compteurPartir = new Couple<Integer,Integer>(one,two);
+	}
+	
+	public void reinitializeCompteurPartir() {
+		compteurPartir = new Couple<Integer,Integer>(0,0);
+	}
+	
+	public Couple<Integer,Integer> getCompteurPartir() {
+		return compteurPartir;
+	}
+	
+	public void setPosGolemPartir(String p) {
+		posGolemPartir = p;
+	}
+	
+	public String getPosGolemPartir() {
+		return posGolemPartir;
 	}
 	
 	/**

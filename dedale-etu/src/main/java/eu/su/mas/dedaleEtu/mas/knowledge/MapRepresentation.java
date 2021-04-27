@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -578,7 +579,33 @@ public class MapRepresentation implements Serializable {
 		
 	}
 
-
+	public List<String> getAway(String me, String posGolem, List<String> no){
+		no.add(posGolem);
+		boolean found = false;
+		int size = g.nodes().toArray().length;
+		List<String> path = new ArrayList<String>();
+		
+		while (!found) {
+			found = true;
+			
+			Random rand = new Random();
+			
+			int na = rand.nextInt(size);
+			
+			path = getShortestPath(me, g.getNode(na).getId());
+			
+			for (String s : no) {
+				if (path.contains(s)) {
+					found = false;
+				}
+				else if (path.size() == 0) {
+					found = false;
+				}
+			}
+		}
+		
+		return path;
+	}
 
 
 }

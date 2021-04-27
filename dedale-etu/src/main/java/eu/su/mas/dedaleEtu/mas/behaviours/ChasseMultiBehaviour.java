@@ -36,6 +36,16 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 			
 			String nextNode = null;
 			
+			if (((ExploreMultiAgent)this.myAgent).getCompteurPartir().getRight() > 3) {
+				((ExploreMultiAgent)this.myAgent).reinitializeCompteurPartir();
+				((ExploreMultiAgent)this.myAgent).setPosGolemPartir(null);
+			}
+			else if (((ExploreMultiAgent)this.myAgent).getCompteurPartir().getLeft() > 20) {
+				((ExploreMultiAgent)this.myAgent).reinitializeCompteurPartir();
+				((ExploreMultiAgent)this.myAgent).setPosGolemPartir(null);
+			}
+			
+			boolean finished = false;
 			boolean givenGolem = false;
 			boolean golem = false;
 			boolean givenPGolem = false;
@@ -44,6 +54,13 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				if (c.getLeft().getRight() != null) {
 					if (this.myMap.sendNodeEdges(c.getLeft().getRight()).getLeft() > 1)
 						givenGolem = true;
+				}
+				
+				if (c.getRight().contains("FINISHED")) {
+					if (!this.myMap.sendNodeEdges(c.getLeft().getRight()).getRight().contains(myPosition)) {
+						finished = true;
+						((ExploreMultiAgent)this.myAgent).setPosGolemPartir(c.getLeft().getRight());
+					}
 				}
 			}
 			
@@ -57,6 +74,8 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getPositionGolem())) {
 						golem = false;
 						((ExploreMultiAgent)this.myAgent).setPositionGolem(null);
+						((ExploreMultiAgent)this.myAgent).reinitializeCompteur();
+						((ExploreMultiAgent)this.myAgent).reinitializeFinish();
 					}
 				}
 			}
@@ -123,7 +142,27 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 			 * Décision de nextNode.
 			 */
 			
-			if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty() && ((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()
+			if ((((ExploreMultiAgent)this.myAgent).getCompteurPartir().getLeft() >= 1) || finished) {
+				if (finished)
+					((ExploreMultiAgent)this.myAgent).reinitializeCompteurPartir();
+				
+				List<String> no = new ArrayList<String>();
+				String posGolem = ((ExploreMultiAgent)this.myAgent).getPosGolemPartir();
+				
+				no = this.myMap.sendNodeEdges(posGolem).getRight();
+				
+				nextNode = this.myMap.getAway(myPosition, posGolem, no).get(0);
+				
+				((ExploreMultiAgent)this.myAgent).addLCompteurPartir();
+				
+				if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty()) {
+					((ExploreMultiAgent)this.myAgent).addRCompteurPartir();
+				}
+				
+				System.out.println(this.myAgent.getLocalName() + " -- I'm not needed here");
+			}
+			
+			else if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty() && ((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()
 					&& !givenPGolem) {
 				
 				List<String> nodes = ((ExploreMultiAgent)this.myAgent).getObsNodes();
@@ -167,6 +206,7 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 			else if (golem) {
 				System.out.println(this.myAgent.getLocalName() + " -- 2");
 				nextNode = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
+				((ExploreMultiAgent)this.myAgent).addCompteur();
 			}
 			
 			else if (givenGolem) {

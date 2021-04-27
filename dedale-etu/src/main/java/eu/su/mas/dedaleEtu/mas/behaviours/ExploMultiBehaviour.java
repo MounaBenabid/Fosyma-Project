@@ -72,7 +72,7 @@ public class ExploMultiBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(150);
+				this.myAgent.doWait(350);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}	
