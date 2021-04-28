@@ -3,6 +3,7 @@ package eu.su.mas.dedaleEtu.mas.agents.dummies.explo;
 import java.util.ArrayList;
 import java.util.List;
 
+import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
@@ -11,6 +12,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.FirstPartExploBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.TransitionBehaviour;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
@@ -46,6 +48,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	private List<Couple<String,String>> finish;
 	private Couple<Integer,Integer> compteurPartir;
 	private String posGolemPartir;
+	private List<Couple<String, SerializableSimpleGraph<String, MapAttribute>>> othersMaps;
 	
 
 	/**
@@ -65,6 +68,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		compteurGolem = 0;
 		this.reinitializeFinish();
 		this.reinitializeCompteurPartir();
+		othersMaps = new ArrayList<Couple<String, SerializableSimpleGraph<String, MapAttribute>>>();
 		
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 	
@@ -257,6 +261,47 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	
 	public String getPosGolemPartir() {
 		return posGolemPartir;
+	}
+	
+	public void addOthersMap(Couple<String,SerializableSimpleGraph<String, MapAttribute>> other) {
+		Couple<String,SerializableSimpleGraph<String, MapAttribute>> alreadyCouple = null;
+		
+		for (Couple<String,SerializableSimpleGraph<String, MapAttribute>> c : othersMaps) {
+			if (c.getLeft().equals(other.getLeft())) {
+				alreadyCouple = c;
+			}
+		}
+		
+		if (alreadyCouple != null) {
+			SerializableSimpleGraph<String, MapAttribute> map = getMyMap().mergeMaps(alreadyCouple.getRight(), other.getRight());
+			other = new Couple<String,SerializableSimpleGraph<String, MapAttribute>>(other.getLeft(), map);
+		}
+		
+		othersMaps.add(other);
+	}
+	
+	public boolean doIHaveOtherMap(String name) {
+		boolean doI = false;
+		
+		for (Couple<String,SerializableSimpleGraph<String, MapAttribute>> c : othersMaps) {
+			if (c.getLeft().equals(name)) {
+				doI = true;
+			}
+		}
+		
+		return doI;
+	}
+	
+	public Couple<String,SerializableSimpleGraph<String, MapAttribute>> getOtherMap(String name){
+		Couple<String,SerializableSimpleGraph<String, MapAttribute>> other = null;
+		
+		for (Couple<String,SerializableSimpleGraph<String, MapAttribute>> c : othersMaps) {
+			if (c.getLeft().equals(name)) {
+				other = c;
+			}
+		}
+		
+		return other;
 	}
 	
 	/**

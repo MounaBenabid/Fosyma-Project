@@ -11,7 +11,7 @@ import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreMultiAgent;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agents.GateKeeperAgent;
 import eu.su.mas.dedale.mas.agents.dedaleDummyAgents.DummyWumpusShift;
-
+import eu.su.mas.dedale.mas.agents.dedaleDummyAgents.Controlled.ControlledAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -298,7 +298,8 @@ public class Principal {
 		Object [] entityParameters={"My parameters"};
 //		
 //		//4) Give the class name of your agent to let the system instantiate it
-		ag=createNewDedaleAgent(c, agentName, DummyWumpusShift.class.getName(), entityParameters);
+		//ag=createNewDedaleAgent(c, agentName, DummyWumpusShift.class.getName(), entityParameters);
+		ag=createNewDedaleAgent(c, agentName, ControlledAgent.class.getName(), entityParameters);
 		agentList.add(ag);	
 		
 		/*********

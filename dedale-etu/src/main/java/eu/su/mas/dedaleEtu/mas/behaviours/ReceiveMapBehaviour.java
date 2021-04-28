@@ -58,8 +58,9 @@ public class ReceiveMapBehaviour extends SimpleBehaviour implements Serializable
 						this.myMap.mergeMap(o.getRight());
 						((ExploreMultiAgent)this.myAgent).setMyMap(this.myMap);
 						System.out.println(this.myAgent.getLocalName()+ "<---- Map received from "+msg.getSender().getLocalName());
+						//((ExploreMultiAgent)this.myAgent).addOthersMap(new Couple<String, SerializableSimpleGraph<String, MapAttribute>>(msg.getSender().getLocalName(), o.getRight()));
 						this.result=true;
-					}
+					}	
 				} catch (UnreadableException e) {
 					e.printStackTrace();
 				}

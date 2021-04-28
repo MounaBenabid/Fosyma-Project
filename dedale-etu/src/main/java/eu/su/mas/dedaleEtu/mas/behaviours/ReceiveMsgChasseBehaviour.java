@@ -46,10 +46,12 @@ public class ReceiveMsgChasseBehaviour extends OneShotBehaviour {
 					
 					((ExploreMultiAgent)this.myAgent).removeFinish(remCouple);
 					String posGolem = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
-					if (o.getLeft().getRight().equals(posGolem)) {
-						Couple<Integer, List<String>> c = ((ExploreMultiAgent)this.myAgent).getMyMap().sendNodeEdges(posGolem);
-						if (c.getRight().contains(o.getLeft().getLeft())) {
-							((ExploreMultiAgent)this.myAgent).addFinish(new Couple<String,String>(msg.getSender().getLocalName(), o.getLeft().getLeft()));
+					if (o.getLeft().getRight() != null) {
+						if (o.getLeft().getRight().equals(posGolem)) {
+							Couple<Integer, List<String>> c = ((ExploreMultiAgent)this.myAgent).getMyMap().sendNodeEdges(posGolem);
+							if (c.getRight().contains(o.getLeft().getLeft())) {
+								((ExploreMultiAgent)this.myAgent).addFinish(new Couple<String,String>(msg.getSender().getLocalName(), o.getLeft().getLeft()));
+							}
 						}
 					}
 				}

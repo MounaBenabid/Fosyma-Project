@@ -81,22 +81,24 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 			}
 			
 			if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem() != null) {
-				givenPGolem = true;
-				
-				for (String s : ((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getLeft()) {
-					if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight().equals(s)) {
-						givenPGolem = false;
-						((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
-						break;
-					}
-				}
-				
-				if (givenPGolem) {
-					for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
-						if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
+				if (this.myMap.sendNodeEdges(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight()).getLeft() > 1) {
+					givenPGolem = true;
+					
+					for (String s : ((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getLeft()) {
+						if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight().equals(s)) {
 							givenPGolem = false;
 							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
 							break;
+						}
+					}
+					
+					if (givenPGolem) {
+						for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+							if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
+								givenPGolem = false;
+								((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+								break;
+							}
 						}
 					}
 				}
@@ -253,12 +255,10 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				
 				for (Couple<Couple<String,String>, List<String>> l : othNodesStench) {
 					for (String s : l.getRight()) {
-						if (!nodesStench.contains(s)) {
-							List<String> path = this.myMap.getShortestPath(myPosition, s);
-							if ((path.size() != 0) && !path.isEmpty()) {
-								if (((ExploreMultiAgent)this.myAgent).getObsNodes().contains(path.get(0))) {
-									nodesStench.add(new Couple<String, Integer>(s, path.size()));
-								}
+						List<String> path = this.myMap.getShortestPath(myPosition, s);
+						if ((path.size() != 0) && !path.isEmpty()) {
+							if (((ExploreMultiAgent)this.myAgent).getObsNodes().contains(path.get(0))) {
+								nodesStench.add(new Couple<String, Integer>(s, path.size()));
 							}
 						}
 					}
@@ -342,7 +342,7 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				// si on n'a qu'une feuille avec une odeur mais plus d'une feuille observables, le golem est peut-être dans la feuille
 				// on essaye d'aller dans la feuille
 				if (fs == 1 && f > 1) {
-					for (String node : obsNodes) {
+					for (String node : nodesStench) {
 						Couple<Integer, List<String>> l = this.myMap.sendNodeEdges(node);
 						if (l.getLeft() == 1) {
 							nextNode = node;
@@ -351,7 +351,9 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				}
 					
 				else {
+					
 					if (nodesStench.size() != 1) {
+					 
 						
 						List<String> remNodes = new ArrayList<String>();
 						

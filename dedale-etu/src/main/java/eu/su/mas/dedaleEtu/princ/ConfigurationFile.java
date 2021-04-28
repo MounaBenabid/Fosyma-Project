@@ -50,7 +50,7 @@ public final class ConfigurationFile {
 	/**
 	 * The environment is either manually designed, or generated with a specific generator
 	 */
-	public static GeneratorType GENERATOR_TYPE=GeneratorType.GS_GRID;
+	public static GeneratorType GENERATOR_TYPE=GeneratorType.MANUAL;
 
 	/**
 	 * 	The GateKeeper is in charge of the Platform and of the agents within, do not change its name.
@@ -70,9 +70,9 @@ public final class ConfigurationFile {
 	/**
 	 * Give the topology 
 	 */
-	public static String INSTANCE_TOPOLOGY=null;
+	//public static String INSTANCE_TOPOLOGY=null;
 	
-	//public static String INSTANCE_TOPOLOGY="resources/topology/map2020-topologyExam1-graph.dgs";
+	public static String INSTANCE_TOPOLOGY="resources/topology/map2020-topologyExam1-graph.dgs";
 	//public static String INSTANCE_TOPOLOGY="resources/topology/HouatTopology";
 	//public static String INSTANCE_TOPOLOGY="resources/topology/map2018-topology-ica";
 	//public static String INSTANCE_TOPOLOGY="resources/topology/map2020-topologyExam1-tree.dgs";
@@ -145,11 +145,11 @@ public final class ConfigurationFile {
 	/**
 	 * Must'nt be null as it describes the native agents' capabilities 
 	 */
-	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExploCoop-3";
+	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExploCoop-3";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES=null;
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExplo";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExplo-2";
-	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExploCoop-2";
+	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExploCoop-2";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentKeyboardControlled";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/hunt/map2020-entitiesTree";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/hunt/map2020-entitiesGraph";

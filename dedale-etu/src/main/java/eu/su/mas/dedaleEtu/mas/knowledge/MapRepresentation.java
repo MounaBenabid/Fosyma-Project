@@ -366,7 +366,7 @@ public class MapRepresentation implements Serializable {
 	 */
 	public List<String> shortestPathNewMap(String idFrom,String idTo,List<String> nodesId) {
 		
-	/**
+	/*
 	 *	MapRepresentation newMap = new MapRepresentation();
 		
 		for (Object node : this.g.nodes().toArray()) {
@@ -605,6 +605,30 @@ public class MapRepresentation implements Serializable {
 		}
 		
 		return path;
+	}
+
+	public SerializableSimpleGraph<String, MapAttribute> mergeMaps(SerializableSimpleGraph<String, MapAttribute> sg1, SerializableSimpleGraph<String, MapAttribute> sg2){
+		for (SerializableNode<String, MapAttribute> n: sg2.getAllNodes()) {
+			if (sg1.getNode(n.getNodeId()) == null) {
+				sg1.addNode(n.getNodeId(), n.getNodeContent());
+			}
+			
+			else if ((n.getNodeContent()==MapAttribute.closed) && (sg1.getNode(n.getNodeId()).getNodeContent()==MapAttribute.open)) {
+				sg1.getNode(n.getNodeId()).setContent(n.getNodeContent());
+			}
+		}
+		
+		// AJOUTER DANS SG1 LES EDGES DE SG2 QUI NE SONT PAS DANS SG1.
+		
+		return sg1;
+	}
+	
+	public SerializableSimpleGraph<String, MapAttribute> myMapMinusTheirs(Couple<String,SerializableSimpleGraph<String, MapAttribute>> other){
+		Graph ng = new SingleGraph("New graph");
+		
+		// METTRE LES NOEUDS DE NOTRE MAP QUI NE SONT PAS DANS OTHER, DANS NG, PUIS SERIALISER NG ET LE METTRE EN RETOUR.
+		
+		return other.getRight();
 	}
 
 
