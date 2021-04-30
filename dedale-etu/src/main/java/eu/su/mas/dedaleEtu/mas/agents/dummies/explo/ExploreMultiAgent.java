@@ -49,6 +49,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	private Couple<Integer,Integer> compteurPartir;
 	private String posGolemPartir;
 	private List<Couple<String, SerializableSimpleGraph<String, MapAttribute>>> othersMaps;
+	private Couple<Boolean, String> noGolem;
 	
 
 	/**
@@ -64,6 +65,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		
 		this.initializeOtherAgentsPos();
 		
+		nextNode = null;
 		lastPosition = null;
 		compteurGolem = 0;
 		this.reinitializeFinish();
@@ -302,6 +304,14 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		}
 		
 		return other;
+	}
+	
+	public void setNoGolem(Couple<Boolean, String> b) {
+		noGolem = b;
+	}
+	
+	public Couple<Boolean, String> getNoGolem() {
+		return noGolem;
 	}
 	
 	/**

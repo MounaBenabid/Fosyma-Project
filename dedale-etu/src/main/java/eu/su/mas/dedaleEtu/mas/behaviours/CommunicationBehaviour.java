@@ -40,6 +40,10 @@ public class CommunicationBehaviour extends ParallelBehaviour {
 		fsmReceive.registerTransition("getPing", "end", 0);
 		
 		addSubBehaviour(fsmReceive);
+		
+		ReceiveMapBehaviour incaseChasse = new ReceiveMapBehaviour(myagent, myMap);
+		
+		addSubBehaviour(incaseChasse);
 	/*	
 		if(receiveMsgB.onEnd() == 1) {
 			if(receiveMapB.onEnd() == 0) 

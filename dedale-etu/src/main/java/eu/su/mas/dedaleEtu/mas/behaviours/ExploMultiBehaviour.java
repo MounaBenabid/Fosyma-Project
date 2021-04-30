@@ -96,8 +96,24 @@ public class ExploMultiBehaviour extends OneShotBehaviour {
 					if (otherAgentsPos.isEmpty() || nodeUs.size()==1) {
 						nextNode=this.myMap.getShortestPathToClosestOpenNode(myPosition).get(0);
 						System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(0).getLeft());
+				/*		if (!((ExploreMultiAgent)this.myAgent).getNoGolem().getLeft()) {
+							if (nodeUs.get(0).getLeft().equals(((ExploreMultiAgent)this.myAgent).getNoGolem().getRight())) {
+								this.myMap.addNode(nodeUs.get(0).getLeft(), MapAttribute.closed);
+								this.end = 1;
+							}
+						}
+				*/
 					}
 					else {
+						if (!((ExploreMultiAgent)this.myAgent).getNoGolem().getLeft()) {
+							Couple<String,Integer> remove = null;
+							for (Couple<String,Integer> c : nodeUs) {
+								if (c.getLeft().equals(((ExploreMultiAgent)this.myAgent).getNoGolem().getRight())) {
+									remove = c;
+								}
+							}
+							nodeUs.remove(remove);
+						}
 						int i = 0;
 						System.out.println(this.myAgent.getLocalName() + " can go to " + nodeUs);
 						while (nextNode == null) {
@@ -136,6 +152,8 @@ public class ExploMultiBehaviour extends OneShotBehaviour {
 	
 				
 				((ExploreMultiAgent)this.myAgent).setMyMap(this.myMap);
+				((ExploreMultiAgent)this.myAgent).setNextNode(nextNode);
+				((ExploreMultiAgent)this.myAgent).setLastPosition(myPosition);
 				
 				/************************************************
 				 * 				END API CALL ILUSTRATION

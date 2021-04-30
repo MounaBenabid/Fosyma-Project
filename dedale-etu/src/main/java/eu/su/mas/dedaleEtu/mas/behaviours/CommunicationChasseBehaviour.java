@@ -39,16 +39,18 @@ public class CommunicationChasseBehaviour extends SimpleBehaviour {
 		msg.setProtocol("CHASSE-STENCH");
 		msg.setSender(this.myAgent.getAID());
 		
+		Couple<String,String> couple = new Couple<String,String>(myPosition, positionGolem);
+		
 		for (int i=0; i<receiversNames.size(); i++) {
 			String agentName = receiversNames.get(i);
-			try {
-				Couple<String,String> couple = new Couple<String,String>(myPosition, positionGolem);
-				msg.setContentObject(new Couple<Couple<String,String>,List<String>>(couple, nodesStench));
-				msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));  
-				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));  
+		}
+		
+		try {
+			msg.setContentObject(new Couple<Couple<String,String>,List<String>>(couple, nodesStench));
+			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	

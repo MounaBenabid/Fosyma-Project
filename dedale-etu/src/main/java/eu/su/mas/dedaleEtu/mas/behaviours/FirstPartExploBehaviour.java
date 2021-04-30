@@ -1,27 +1,14 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
-import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
-import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreSoloAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.ExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
-import jade.core.AID;
-import jade.core.behaviours.FSMBehaviour;
-import jade.core.behaviours.ParallelBehaviour;
-import jade.core.behaviours.SimpleBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.lang.acl.ACLMessage;
-import javafx.util.Pair;
 
 
 /**
@@ -78,7 +65,7 @@ public class FirstPartExploBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(100);
+				this.myAgent.doWait(200);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -86,9 +73,43 @@ public class FirstPartExploBehaviour extends OneShotBehaviour {
 			//1) remove the current node from openlist and add it to closedNodes.
 
 			this.myMap.addNode(myPosition,MapAttribute.closed);
+			boolean noGolem = true;
+			
+			String nextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
+			
+			if (nextNode != null) {
+				if (!nextNode.equals(((ExploreMultiAgent)this.myAgent).getLastPosition())) {
+					for (Couple<String,List<Couple<Observation,Integer>>> o : lobs) {
+						if (o.getLeft().equals(nextNode)){
+							if (containsStench(o.getRight())) {
+								if (((ExploreMultiAgent)this.myAgent).getOtherAgentsPos().isEmpty()) {
+									noGolem = false;
+									System.out.println(this.myAgent.getLocalName() + " encountered a golem !");
+								}
+								else {
+									boolean someoneElse = false;
+									
+									for (Couple<String,String> c : ((ExploreMultiAgent)this.myAgent).getOtherAgentsPos()) {
+										if (c.getRight().equals(nextNode)) {
+											someoneElse = true;
+										}
+									}
+									
+									if (!someoneElse) {
+										noGolem = false;
+										System.out.println(this.myAgent.getLocalName() + " encountered a golem !");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			((ExploreMultiAgent)this.myAgent).setNoGolem(new Couple<Boolean, String>(noGolem, nextNode));
 
 			//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
-			String nextNode=null;
+			nextNode=null;
 			Iterator<Couple<String, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
 			while(iter.hasNext()){
 				String nodeId=iter.next().getLeft();
@@ -96,7 +117,9 @@ public class FirstPartExploBehaviour extends OneShotBehaviour {
 				//the node may exist, but not necessarily the edge
 				if (myPosition!=nodeId) {
 					this.myMap.addEdge(myPosition, nodeId);
-					if (nextNode==null && isNewNode) nextNode=nodeId;
+					if (nextNode==null && isNewNode) {
+						nextNode=nodeId;
+					}
 				}
 			}
 			
@@ -111,5 +134,13 @@ public class FirstPartExploBehaviour extends OneShotBehaviour {
 	public int onEnd() {
 		return 1;
 	}
+	
+	public boolean containsStench(List<Couple<Observation, Integer>> L){
+        for (Couple<Observation, Integer> c:L){
+            if(c.getLeft().getName().equals("Stench"))
+                return true;
+        }
+        return false;
+    }
 
 }
