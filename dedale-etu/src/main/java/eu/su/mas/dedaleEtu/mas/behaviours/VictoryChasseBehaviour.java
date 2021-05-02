@@ -64,6 +64,7 @@ public class VictoryChasseBehaviour extends SimpleBehaviour {
 				}
 				
 				if (!didIFinish(myPosition)) {
+					System.out.println(this.myAgent.getLocalName() + " -- Actually no I didn't capture the golem I'm dumb.");
 					finished = true;
 				}
 				else if (o.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getPositionGolem())) {
@@ -71,6 +72,7 @@ public class VictoryChasseBehaviour extends SimpleBehaviour {
 					((ExploreMultiAgent)this.myAgent).setPositionGolem(null);
 					((ExploreMultiAgent)this.myAgent).reinitializeCompteur();
 					((ExploreMultiAgent)this.myAgent).reinitializeFinish();
+					System.out.println(this.myAgent.getLocalName() + " -- Actually no I didn't capture the golem I'm dumb.");
 					finished = true;
 				}
 				else {

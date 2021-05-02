@@ -201,12 +201,10 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 				
 				int na = rand.nextInt(size);
 				
-				System.out.println(this.myAgent.getLocalName() + " -- 1");
 				nextNode = nodes.get(na);
 			}
 			
 			else if (golem) {
-				System.out.println(this.myAgent.getLocalName() + " -- 2");
 				nextNode = ((ExploreMultiAgent)this.myAgent).getPositionGolem();
 				((ExploreMultiAgent)this.myAgent).addCompteur();
 			}
@@ -236,20 +234,16 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					}
 				}
 				
-				System.out.println(this.myAgent.getLocalName() + " -- 3");
 			}
 			
 			else if (givenPGolem) {
 				Couple<List<String>,String> c = ((ExploreMultiAgent)this.myAgent).getGivenPosGolem();
 				
-				System.out.println(this.myAgent.getLocalName() + " -- 4");
 				nextNode = this.myMap.shortestPathNewMap(myPosition, c.getRight(), c.getLeft()).get(0);
 			}
 			
 			else if (((ExploreMultiAgent)this.myAgent).getNodesStench().isEmpty()) {
 				
-				if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem() != null)
-					System.out.println(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight());
 				List<Couple<Couple<String,String>, List<String>>> othNodesStench = ((ExploreMultiAgent)this.myAgent).getOthNodesStench();
 				List<Couple<String,Integer>> nodesStench = new ArrayList<Couple<String,Integer>>();
 				
@@ -311,7 +305,6 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					}
 				}
 			*/	
-				System.out.println(this.myAgent.getLocalName() + " -- 5");
 			}
 			
 			else {
@@ -376,8 +369,6 @@ public class ChasseMultiBehaviour extends OneShotBehaviour {
 					
 					nextNode = nodesStench.get(na);
 				}
-				
-				System.out.println(this.myAgent.getLocalName() + " -- 6");
 			}
 			
 			((ExploreMultiAgent)this.myAgent).setLastPosition(myPosition);

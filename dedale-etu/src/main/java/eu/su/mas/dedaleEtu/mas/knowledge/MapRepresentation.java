@@ -540,7 +540,7 @@ public class MapRepresentation implements Serializable {
 			
 			else {
 				ng.addEdge(((Edge) edge).getId(), ng.getNode(((Edge) edge).getNode0().getId()), ng.getNode(((Edge) edge).getNode1().getId()))
-				.setAttribute("length", 100);
+				.setAttribute("length", 1000);
 			}
 		}
 		
@@ -626,7 +626,7 @@ public class MapRepresentation implements Serializable {
 	public SerializableSimpleGraph<String, MapAttribute> myMapMinusTheirs(Couple<String,SerializableSimpleGraph<String, MapAttribute>> other){
 		Graph ng = new SingleGraph("New graph");
 		
-		// METTRE LES NOEUDS DE NOTRE MAP QUI NE SONT PAS DANS OTHER, DANS NG, PUIS SERIALISER NG ET LE METTRE EN RETOUR.
+		// METTRE LES NOEUDS ET EDGES DE NOTRE MAP QUI NE SONT PAS DANS OTHER, DANS NG, PUIS SERIALISER NG ET LE METTRE EN RETOUR.
 		
 		return other.getRight();
 	}

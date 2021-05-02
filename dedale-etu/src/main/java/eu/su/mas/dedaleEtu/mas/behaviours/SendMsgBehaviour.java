@@ -57,7 +57,6 @@ public class SendMsgBehaviour extends SimpleBehaviour{
 		ACLMessage msg = this.myAgent.receive(msgTemplate);
 		
 		if (msg != null) {		
-			System.out.println(this.myAgent.getLocalName()+ "<---- Got answer from "+msg.getSender().getLocalName()+", content= "+msg.getContent());
 			//for (String receiverName:receiversNames) {
 				//if (msg.getSender().getLocalName().equals(receiverName))
 			this.getAnswer = true;

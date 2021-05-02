@@ -59,9 +59,7 @@ public class SendMapBehaviour extends SimpleBehaviour implements Serializable{
 					msg.addReceiver(new AID(this.receiverName, AID.ISLOCALNAME));  
 
 					//Mandatory to use this method (it takes into account the environment to decide if someone is reachable or not)
-					((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-					System.out.println(this.myAgent.getLocalName() + "<---- sent map to " + this.receiverName);
-						
+					((AbstractDedaleAgent)this.myAgent).sendMessage(msg);						
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

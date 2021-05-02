@@ -115,13 +115,11 @@ public class ExploMultiBehaviour extends OneShotBehaviour {
 							nodeUs.remove(remove);
 						}
 						int i = 0;
-						System.out.println(this.myAgent.getLocalName() + " can go to " + nodeUs);
 						while (nextNode == null) {
 							int j = 0;
 							//we compare our path with the other agents
 							for (Couple<String,String> o : otherAgentsPos) {
 								List<Couple<String,Integer>> nodeThem = this.myMap.getDistanceOpenNodes(o.getRight());
-								System.out.println(this.myAgent.getLocalName() + "-- " + o.getLeft() + " wants to go to " + nodeThem.get(0).getLeft());
 								if (nodeUs.get(i).getLeft().compareTo(nodeThem.get(0).getLeft())==0) {
 									if (nodeUs.get(i).getRight() > nodeThem.get(0).getRight()) {
 										i++;

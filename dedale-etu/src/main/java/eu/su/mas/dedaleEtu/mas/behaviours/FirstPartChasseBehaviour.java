@@ -87,11 +87,13 @@ public class FirstPartChasseBehaviour extends OneShotBehaviour {
 					}
 				}
 				
-				else if (!((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()) {
-					for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
-						if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
-							((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
-							break;
+				if (((ExploreMultiAgent)this.myAgent).getGivenPosGolem() != null) {
+					if (!((ExploreMultiAgent)this.myAgent).getOthNodesStench().isEmpty()) {
+						for (Couple<Couple<String,String>, List<String>> c : ((ExploreMultiAgent)this.myAgent).getOthNodesStench()) {
+							if (c.getLeft().getLeft().equals(((ExploreMultiAgent)this.myAgent).getGivenPosGolem().getRight())) {
+								((ExploreMultiAgent)this.myAgent).setGivenPosGolem(null);
+								break;
+							}
 						}
 					}
 				}
@@ -128,10 +130,12 @@ public class FirstPartChasseBehaviour extends OneShotBehaviour {
 			if (((ExploreMultiAgent)this.myAgent).getCompteur() >= 50) {
 				if (this.myMap.sendNodeEdges(((ExploreMultiAgent)this.myAgent).getPositionGolem()).getLeft() == 1) {
 					end = 2;
+					System.out.println(this.myAgent.getLocalName() + " -- I think I blocked a golem ! I'm so smart !");
 				}
 				else {
 					if (didIFinish(myPosition)) {
 						end = 2;
+						System.out.println(this.myAgent.getLocalName() + " -- I think I blocked a golem with my friends ! We're so smart !");
 					}
 				}
 			}

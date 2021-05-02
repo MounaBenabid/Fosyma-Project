@@ -31,7 +31,6 @@ public class ReceiveMsgBehaviour extends SimpleBehaviour {
 		//System.out.println("<---- test receiveping ");
 		if (msg != null) {		
 			if (myPosition!=""){
-				System.out.println(this.myAgent.getLocalName()+ "<---- Ping received from "+msg.getSender().getLocalName());
 				sendAnswer(msg.getSender().getLocalName());
 				this.result=true;
 			}
