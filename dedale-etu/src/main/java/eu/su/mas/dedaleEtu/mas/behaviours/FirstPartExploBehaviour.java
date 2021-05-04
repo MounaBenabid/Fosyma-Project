@@ -63,12 +63,13 @@ public class FirstPartExploBehaviour extends OneShotBehaviour {
 			
 			/**
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
-			 */
+			 
 			try {
 				this.myAgent.doWait(200);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			 */
 
 			//1) remove the current node from openlist and add it to closedNodes.
 

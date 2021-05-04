@@ -72,7 +72,7 @@ public class ExploMultiBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(350);
+				this.myAgent.doWait(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}	
@@ -95,7 +95,7 @@ public class ExploMultiBehaviour extends OneShotBehaviour {
 					List<Couple<String,Integer>> nodeUs = this.myMap.getDistanceOpenNodes(myPosition);
 					if (otherAgentsPos.isEmpty() || nodeUs.size()==1) {
 						nextNode=this.myMap.getShortestPathToClosestOpenNode(myPosition).get(0);
-						System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(0).getLeft());
+						//System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(0).getLeft());
 				/*		if (!((ExploreMultiAgent)this.myAgent).getNoGolem().getLeft()) {
 							if (nodeUs.get(0).getLeft().equals(((ExploreMultiAgent)this.myAgent).getNoGolem().getRight())) {
 								this.myMap.addNode(nodeUs.get(0).getLeft(), MapAttribute.closed);
@@ -131,16 +131,16 @@ public class ExploMultiBehaviour extends OneShotBehaviour {
 							}
 							if (j == otherAgentsPos.size()) {
 								nextNode=this.myMap.getShortestPath(myPosition,nodeUs.get(i).getLeft()).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
-								System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(i).getLeft());
+								//System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(i).getLeft());
 							}
 							else if (i == nodeUs.size()) {
 								if (nodeUs.size() > otherAgentsPos.size()) {
 									nextNode=this.myMap.getShortestPath(myPosition,nodeUs.get(i-1).getLeft()).get(0);
-									System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(i-1).getLeft());
+									//System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(i-1).getLeft());
 								}
 								else {
 									nextNode=this.myMap.getShortestPathToClosestOpenNode(myPosition).get(0);
-									System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(0).getLeft());
+									//System.out.println(this.myAgent.getLocalName() + " will go to " + nextNode + " destination " + nodeUs.get(0).getLeft());
 								}
 							}
 						}
